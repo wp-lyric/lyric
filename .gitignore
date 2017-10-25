@@ -1,0 +1,10 @@
+# Configuration files
+.idea
+
+# Logs
+tests/_reports
+
+# Dependencies
+/vendor/
+/node_modules/
+composer.lock

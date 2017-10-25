@@ -1,0 +1,275 @@
+<?php
+
+namespace LyricTests\PostTypes;
+
+use Mockery;
+use Brain\Monkey;
+use Brain\Monkey\Functions;
+use PHPUnit\Framework\TestCase;
+use Lyric\PostTypes\RegisterPostType;
+
+class RegisterPostTypeTest extends TestCase
+{
+
+    protected function setUp()
+    {
+        parent::setUp();
+        Monkey\setUp();
+    }
+
+    protected function tearDown()
+    {
+        Monkey\tearDown();
+        parent::tearDown();
+    }
+
+    public function test_build_names_used_in_post_type_with_single_option()
+    {
+        $register = new RegisterPostType('lyric-post-type');
+
+        $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $register);
+        $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
+        $this->assertAttributeEquals('Lyric Post Types', 'plural', $register);
+        $this->assertAttributeEquals('lyric-post-type', 'slug', $register);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Use valid arguments(string|array) to define post type name
+     */
+    public function test_should_throw_exception_if_post_type_name_has_invalid_format()
+    {
+        new RegisterPostType(true);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The [name] key is required in Lyric\PostTypes\RegisterPostType::names
+     */
+    public function test_should_throw_exception_if_required_name_not_exist()
+    {
+        new RegisterPostType([]);
+    }
+
+    public function test_build_names_used_in_post_type_with_array_option()
+    {
+        $register = new RegisterPostType([
+            'name' => 'lyric',
+            'singular' => 'Lyric Post Type',
+            'plural' => 'Lyric Posts',
+            'slug' => 'lyric-post',
+        ]);
+
+        $this->assertAttributeEquals('lyric', 'postTypeName', $register);
+        $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
+        $this->assertAttributeEquals('Lyric Posts', 'plural', $register);
+        $this->assertAttributeEquals('lyric-post', 'slug', $register);
+    }
+
+    public function test_build_names_used_in_post_type_with_incomplete_array_option()
+    {
+        $register = new RegisterPostType([
+            'name' => 'lyric post type',
+        ]);
+
+        $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $register);
+        $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
+        $this->assertAttributeEquals('Lyric Post Types', 'plural', $register);
+        $this->assertAttributeEquals('lyric-post-type', 'slug', $register);
+    }
+
+    public function test_rename_post_type()
+    {
+        $register = new RegisterPostType('lyric-post-type');
+
+        $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $register);
+        $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
+        $this->assertAttributeEquals('Lyric Post Types', 'plural', $register);
+        $this->assertAttributeEquals('lyric-post-type', 'slug', $register);
+
+        $return = $register->assignNames('new-name');
+
+        $this->assertAttributeEquals('new-name', 'postTypeName', $register);
+        $this->assertAttributeEquals('New Name', 'singular', $register);
+        $this->assertAttributeEquals('New Names', 'plural', $register);
+        $this->assertAttributeEquals('new-name', 'slug', $register);
+        $this->assertInstanceOf(RegisterPostType::class, $return);
+    }
+
+    public function test_get_correctly_post_type_name()
+    {
+        $registerOne = new RegisterPostType('lyric-post-type');
+
+        $registerTwo = new RegisterPostType('lyric-post-type');
+        $registerTwo->assignNames('lyric-post-type-two');
+
+        $this->assertEquals('lyric-post-type', $registerOne->getName());
+        $this->assertEquals('lyric-post-type-two', $registerTwo->getName());
+    }
+
+    public function test_should_set_options()
+    {
+        $register = new RegisterPostType('lyric-post-type');
+
+        $return = $register->options([
+            'has_archive' => true,
+            'supports' => ['title', 'thumbnail']
+        ]);
+
+        $this->assertAttributeEquals(
+            [
+                'has_archive' => true,
+                'supports' => ['title', 'thumbnail']
+            ],
+            'options',
+            $register
+        );
+        $this->assertInstanceOf(RegisterPostType::class, $return);
+    }
+
+    public function test_should_set_labels()
+    {
+        $register = new RegisterPostType('lyric-post-type');
+
+        $return = $register->labels([
+            'name' => 'Lyric',
+            'not_found' => 'Not Found Lyric Post'
+        ]);
+
+        $this->assertAttributeEquals(
+            [
+                'name' => 'Lyric',
+                'not_found' => 'Not Found Lyric Post'
+            ],
+            'labels',
+            $register
+        );
+        $this->assertInstanceOf(RegisterPostType::class, $return);
+    }
+
+    public function test_should_set_slug()
+    {
+        $register = new RegisterPostType('lyric-post-type');
+
+        $register->slug('Lyric Posts');
+
+        $this->assertAttributeEquals(
+            'lyric-posts',
+            'slug',
+            $register
+        );
+
+        $register->slug('Lyric-Posts', false);
+
+        $this->assertAttributeEquals(
+            'Lyric-Posts',
+            'slug',
+            $register
+        );
+
+        $this->assertInstanceOf(RegisterPostType::class, $register->slug('return-instance'));
+    }
+
+    public function test_set_icon()
+    {
+        $register = new RegisterPostType('lyric-post-type');
+
+        $this->assertInstanceOf(RegisterPostType::class, $register->icon('custom-icon'));
+
+
+        $this->assertAttributeEquals(
+            'custom-icon',
+            'icon',
+            $register
+        );
+    }
+
+
+    public function test_return_options_and_label_after_merge_default_and_configured()
+    {
+        $register = new RegisterPostType('lyric-post-type');
+
+        $expectedLabels = [
+            'name' => 'Lyric',
+            'singular_name' => 'Lyric Post Type',
+            'menu_name' => 'Lyric Post Types',
+            'name_admin_bar' => 'Lyric Post Type',
+        ];
+
+        $expectedOptions = [
+            'labels' => $expectedLabels,
+            'public' => false,
+            'menu_icon' => '',
+            'menu_position' => 42,
+            'rewrite' => [
+                'slug' => 'lyric-post-type'
+            ],
+        ];
+
+        Functions\expect('__')
+            ->with(Mockery::type('string'), 'lyric')
+            ->andReturnFirstArg();
+
+        $register->options(['public' => false, 'menu_position' => 42]);
+        $register->labels(['name' => 'Lyric']);
+
+        $this->assertEquals($expectedLabels, $register->getLabels());
+        $this->assertEquals($expectedOptions, $register->getOptions());
+    }
+
+
+    public function test_register_post_type()
+    {
+        $postTypeName = 'lyric-post-type';
+
+        $finalLabels = [
+            'name' => 'Lyric Post Types',
+            'singular_name' => 'Lyric Post Type',
+            'menu_name' => 'Lyric Post Types',
+            'name_admin_bar' => 'Lyric Post Type',
+        ];
+
+        $finalOptions = [
+            'public' => true,
+            'menu_icon' => '',
+            'rewrite' => [
+                'slug' => 'lyric-post-type'
+            ],
+            'labels' => $finalLabels,
+        ];
+
+        Functions\expect('post_type_exists')
+            ->once()
+            ->with($postTypeName)
+            ->andReturn(false);
+
+        Functions\expect('register_post_type')
+            ->once()
+            ->with($postTypeName, $finalOptions);
+
+        Functions\when('add_action')
+            ->alias(function ($action, $callable) {
+                $callable();
+            });
+
+        Functions\when('__')
+            ->returnArg(1);
+
+        $register = new RegisterPostType('lyric-post-type');
+
+        $this->assertNull($register->bind());
+    }
+
+    public function test_should_bind_wordpress_hook()
+    {
+        Functions\when('__')
+            ->returnArg(1);
+
+        $postTypeName = 'lyric-post-type';
+        $register = new RegisterPostType($postTypeName);
+
+        $register->bind();
+
+        $this->assertTrue(has_action('init', 'function ()', 1));
+    }
+}
