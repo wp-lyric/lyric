@@ -7,6 +7,13 @@ use League\Container\Container;
 class Lyric
 {
     /**
+     * Lyric instance
+     *
+     * @var null|Lyric
+     */
+    protected static $instance = null;
+
+    /**
      * Container instance
      *
      * @var Container
@@ -36,6 +43,20 @@ class Lyric
     {
         $this->container = $container;
         $this->initContainer();
+    }
+
+    /**
+     * Get Lyric instance
+     *
+     * @return Lyric|null
+     */
+    public static function make()
+    {
+        if (is_null(static::$instance)) {
+            static::$instance = new static(new Container());
+        }
+
+        return static::$instance;
     }
 
     /**

@@ -13,41 +13,8 @@ use Lyric\OptionsPages\PageBase;
 
 class LyricTest extends TestCase
 {
-    /**
-     * @var \Mockery\MockInterface
-     */
-    protected $container;
-
     public function setUp()
     {
-        $this->container = Mockery::mock(Container::class);
-
-        $this->container->shouldReceive('add')
-            ->once()
-            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class, \Lyric\PostTypes\RegisterPostType::class)
-            ->andReturnSelf();
-
-        $this->container->shouldReceive('withArgument')
-            ->once()
-            ->with(Mockery::type(\League\Container\Argument\RawArgument::class))
-            ->andReturnSelf();
-
-        $this->container->shouldReceive('add')
-            ->once()
-            ->with(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class, \Lyric\MetaBox\MetaBoxBuilder::class)
-            ->andReturnSelf();
-
-
-        $this->container->shouldReceive('add')
-            ->once()
-            ->with(\Lyric\Contracts\OptionsPages\PageBuilder::class, \Lyric\OptionsPages\PageBuilder::class)
-            ->andReturnSelf();
-
-        $this->container->shouldReceive('share')
-            ->once()
-            ->with(\Lyric\Contracts\Fields\FieldBuilder::class, \Lyric\Fields\FieldBuilder::class)
-            ->andReturnSelf();
-
         Monkey\setUp();
     }
 
@@ -57,9 +24,55 @@ class LyricTest extends TestCase
         Mockery::close();
     }
 
+    /**
+     * @return \Mockery\MockInterface
+     */
+    protected function get_mock_container() {
+        $container = Mockery::mock(Container::class);
+
+        $container->shouldReceive('add')
+            ->once()
+            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class, \Lyric\PostTypes\RegisterPostType::class)
+            ->andReturnSelf();
+
+        $container->shouldReceive('withArgument')
+            ->once()
+            ->with(Mockery::type(\League\Container\Argument\RawArgument::class))
+            ->andReturnSelf();
+
+        $container->shouldReceive('add')
+            ->once()
+            ->with(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class, \Lyric\MetaBox\MetaBoxBuilder::class)
+            ->andReturnSelf();
+
+        $container->shouldReceive('add')
+            ->once()
+            ->with(\Lyric\Contracts\OptionsPages\PageBuilder::class, \Lyric\OptionsPages\PageBuilder::class)
+            ->andReturnSelf();
+
+        $container->shouldReceive('share')
+            ->once()
+            ->with(\Lyric\Contracts\Fields\FieldBuilder::class, \Lyric\Fields\FieldBuilder::class)
+            ->andReturnSelf();
+
+        return $container;
+    }
+
+    /**
+     * @
+     */
+    public function test_get_lyric_instance()
+    {
+        $lyric = Lyric::make();
+
+        $this->assertInstanceOf(Lyric::class, $lyric);
+        $this->assertEquals($lyric, Lyric::make());
+    }
+
     public function test_should_register_container()
     {
-        $lyric = new Lyric($this->container);
+        $container = $this->get_mock_container();
+        $lyric = new Lyric($container);
 
         $this->assertAttributeInstanceOf(Container::class, 'container', $lyric);
         $this->assertInstanceOf(Container::class, $lyric->container());
@@ -68,24 +81,24 @@ class LyricTest extends TestCase
     public function test_should_register_post_types()
     {
         $postType = Mockery::mock(PostTypeBase::class);
-
+        $container = $this->get_mock_container();
         // Configure mocks
-        $this->container->shouldReceive('share')
+        $container->shouldReceive('share')
             ->once()
             ->with(PostTypeBase::class)
             ->andReturnSelf();
 
-        $this->container->shouldReceive('withArgument')
+        $container->shouldReceive('withArgument')
             ->once()
-            ->with($this->container)
+            ->with($container)
             ->andReturnSelf();
 
-        $this->container->shouldReceive('has')
+        $container->shouldReceive('has')
             ->once()
             ->with(PostTypeBase::class)
             ->andReturn($postType);
 
-        $this->container->shouldReceive('get')
+        $container->shouldReceive('get')
             ->times(3)
             ->with(PostTypeBase::class)
             ->andReturn($postType);
@@ -96,12 +109,12 @@ class LyricTest extends TestCase
             ->andReturn('lyric-post-type');
 
 
-        $this->container->shouldReceive('has')
+        $container->shouldReceive('has')
             ->once()
             ->with('FakePostType')
             ->andReturn(false);
 
-        $lyric = new Lyric($this->container);
+        $lyric = new Lyric($container);
         $lyric->addPostType(PostTypeBase::class);
 
 
@@ -115,24 +128,24 @@ class LyricTest extends TestCase
     public function test_should_register_options_page()
     {
         $optionsPage = Mockery::mock(PageBase::class);
-
+        $container = $this->get_mock_container();
         // Configure mocks
-        $this->container->shouldReceive('share')
+        $container->shouldReceive('share')
             ->once()
             ->with(PageBase::class)
             ->andReturnSelf();
 
-        $this->container->shouldReceive('withArgument')
+        $container->shouldReceive('withArgument')
             ->once()
             ->with(\Lyric\Contracts\OptionsPages\PageBuilder::class)
             ->andReturnSelf();
 
-        $this->container->shouldReceive('withArgument')
+        $container->shouldReceive('withArgument')
             ->once()
             ->with(\Lyric\Contracts\Fields\FieldBuilder::class)
             ->andReturnSelf();
 
-        $lyric = new Lyric($this->container);
+        $lyric = new Lyric($container);
         $lyric->addOptionsPage(PageBase::class);
 
 
@@ -142,17 +155,18 @@ class LyricTest extends TestCase
 
     public function test_bind_post_type_to_wordpress()
     {
+        $container = $this->get_mock_container();
         // Use contact to create full mock
         $postType = Mockery::mock(\Lyric\Contracts\PostTypes\PostTypeBase::class);
         $optionsPage = Mockery::mock(\Lyric\Contracts\OptionsPages\PageBase::class);
 
         // Configure mocks
-        $this->container->shouldReceive('has')
+        $container->shouldReceive('has')
             ->once()
             ->with(\Lyric\Contracts\PostTypes\PostTypeBase::class)
             ->andReturn(true);
 
-        $this->container->shouldReceive('get')
+        $container->shouldReceive('get')
             ->once()
             ->with(\Lyric\Contracts\PostTypes\PostTypeBase::class)
             ->andReturn($postType);
@@ -161,12 +175,12 @@ class LyricTest extends TestCase
             ->once()
             ->withNoArgs();
 
-        $this->container->shouldReceive('has')
+        $container->shouldReceive('has')
             ->once()
             ->with(\Lyric\Contracts\OptionsPages\PageBase::class)
             ->andReturn(true);
 
-        $this->container->shouldReceive('get')
+        $container->shouldReceive('get')
             ->once()
             ->with(\Lyric\Contracts\OptionsPages\PageBase::class)
             ->andReturn($optionsPage);
@@ -180,7 +194,7 @@ class LyricTest extends TestCase
 
 
         // configure Lyric
-        $lyric = new Lyric($this->container);
+        $lyric = new Lyric($container);
 
         $reflectLyric = new \ReflectionClass(Lyric::class);
 
