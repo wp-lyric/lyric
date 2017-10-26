@@ -5,6 +5,7 @@ namespace Lyric\PostTypes;
 use Lyric\Contracts\PostTypes\PostTypeBase as PostTypeBaseContract;
 use League\Container\ContainerInterface;
 use Lyric\Contracts\PostTypes\RegisterPostType;
+use Lyric\Contracts\PostTypes\ColumnsFactory;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Support\Strings;
 
@@ -57,21 +58,18 @@ abstract class PostTypeBase implements PostTypeBaseContract
      */
     final protected function boot()
     {
-        $this->resolvePostTypeRegister();
+        // Resolve post type register
+        $register = $this->registerPostTypeNames();
+        $this->resolved[RegisterPostType::class] = $this->postType($register);
 
+        // Resolve meta-boxes
         if (!empty($this->metaBoxes)) {
             $this->resolveMetaBoxes();
         }
-    }
 
-    /**
-     * Resolve RegisterPostType instance
-     */
-    final  protected function resolvePostTypeRegister()
-    {
-        $register = $this->container->get(\Lyric\Contracts\PostTypes\RegisterPostType::class);
-        $register = $this->registerPostTypeNames($register);
-        $this->resolved[RegisterPostType::class] = $this->postType($register);
+        // Resolve columns
+        $columnFactory = $this->container->get(ColumnsFactory::class, [$this->postTypeName()]);
+        $this->resolved[ColumnsFactory::class] = $this->columns($columnFactory);
     }
 
     /**
@@ -81,14 +79,14 @@ abstract class PostTypeBase implements PostTypeBaseContract
      *
      * @return RegisterPostType
      */
-    final protected function registerPostTypeNames(RegisterPostType $register)
+    final protected function registerPostTypeNames()
     {
         if (is_null($this->postTypeName)) {
             $className = (new \ReflectionClass($this))->getShortName();
             $this->postTypeName = Strings::slug($className);
         }
 
-        $register->assignNames($this->postTypeName);
+        $register = $this->container->get(\Lyric\Contracts\PostTypes\RegisterPostType::class, [$this->postTypeName]);
 
         return $register;
     }
@@ -136,7 +134,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
     }
 
     /**
-     * Should Configure Post Type
+     * Configure Post Type
      *
      * @param RegisterPostType $register
      *
@@ -145,6 +143,19 @@ abstract class PostTypeBase implements PostTypeBaseContract
     protected function postType(RegisterPostType $register)
     {
         return $register;
+    }
+
+
+    /**
+     * Used to add and to configure columns in the actual post type
+     *
+     * @param ColumnsFactory $columnsFactory
+     *
+     * @return ColumnsFactory
+     */
+    public function columns(ColumnsFactory $columnsFactory)
+    {
+        return $columnsFactory;
     }
 
     /**

@@ -66,8 +66,7 @@ class Lyric
     {
         // Register Post Type Register
         $this->container()
-            ->add(\Lyric\Contracts\PostTypes\RegisterPostType::class, \Lyric\PostTypes\RegisterPostType::class)
-            ->withArgument(new \League\Container\Argument\RawArgument('lyric-post-type'));
+            ->add(\Lyric\Contracts\PostTypes\RegisterPostType::class, \Lyric\PostTypes\RegisterPostType::class);
 
         // Register OptionsPage\Builder
         $this->container()
@@ -76,6 +75,10 @@ class Lyric
         // Register MetaBox Builder
         $this->container()
             ->add(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class, \Lyric\MetaBox\MetaBoxBuilder::class);
+
+        // Register ColumnsFactory
+        $this->container()
+            ->add(\Lyric\Contracts\PostTypes\ColumnsFactory::class, \Lyric\PostTypes\ColumnsFactory::class);
 
         // Register Field Builder
         $this->container()

@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Lyric\PostTypes\PostTypeBase;
 use Lyric\Contracts\PostTypes\RegisterPostType;
 use Lyric\Contracts\Fields\FieldFactory;
+use Lyric\Contracts\PostTypes\ColumnsFactory;
 
 class PostTypeBaseTest extends TestCase
 {
@@ -19,39 +20,43 @@ class PostTypeBaseTest extends TestCase
     {
         $container = Mockery::mock(\League\Container\ContainerInterface::class);
         $register = Mockery::mock(RegisterPostType::class);
+        $columnsFactory = Mockery::mock(ColumnsFactory::class);
 
         // Configure Mocks
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class)
+            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class, ['lyric-post-type'])
             ->andReturn($register);
 
-
-        $register->shouldReceive('assignNames')
+        $container->shouldReceive('get')
             ->once()
-            ->with('lyric-post-type')
-            ->andReturnSelf();
+            ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, ['lyric-post-type'])
+            ->andReturn($columnsFactory);
 
         $register->shouldReceive('getName')
             ->once()
             ->withNoArgs()
             ->andReturn('lyric-post-type');
 
-        $customPostType = Mockery::namedMock('LyricPostType', PostTypeBase::class, [$container])->makePartial();
+        $lyricPostType = Mockery::namedMock('LyricPostType', PostTypeBase::class.'[bind]', [$container])->makePartial();
 
         // Set post type name
-        $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $customPostType);
-        $this->assertEquals('lyric-post-type', $customPostType->postTypeName());
+        $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $lyricPostType);
 
         //
-        $this->assertAttributeEquals([RegisterPostType::class => $register], 'resolved', $customPostType);
-        $this->assertAttributeEmpty('metaBoxes', $customPostType);
+        $this->assertAttributeEquals(
+            [RegisterPostType::class => $register, ColumnsFactory::class => $columnsFactory],
+            'resolved',
+            $lyricPostType
+        );
+        $this->assertAttributeEmpty('metaBoxes', $lyricPostType);
     }
 
-    public function test_should_create_instance_metabox_and_save_in_simple_container()
+    public function test_should_create_instance_metabox_and_save_local_container()
     {
         $container = Mockery::mock(\League\Container\ContainerInterface::class);
         $register = Mockery::mock(RegisterPostType::class);
+        $columnsFactory = Mockery::mock(ColumnsFactory::class);
 
         $metaBoxBuilder = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class);
         $fields = Mockery::mock(FieldFactory::class);
@@ -62,7 +67,7 @@ class PostTypeBaseTest extends TestCase
         // Configure mocks
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class)
+            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class, ['custom-post-type'])
             ->andReturn($register);
 
         $container->shouldReceive('get')
@@ -75,11 +80,15 @@ class PostTypeBaseTest extends TestCase
             ->with(\Lyric\Contracts\Fields\FieldFactory::class)
             ->andReturn($fields);
 
-
-        $register->shouldReceive('assignNames')
+        $container->shouldReceive('get')
             ->once()
-            ->withAnyArgs()
-            ->andReturnSelf();
+            ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, ['custom-post-type'])
+            ->andReturn($columnsFactory);
+
+        $register->shouldReceive('getName')
+            ->once()
+            ->withNoArgs()
+            ->andReturn('custom-post-type');
 
 
         $metaBox->shouldReceive('setPostType')
@@ -91,6 +100,7 @@ class PostTypeBaseTest extends TestCase
 
 
         $customPostType = $this->getMockBuilder(PostTypeBase::class)
+            ->setMockClassName('CustomPostType')
             ->disableOriginalConstructor()
             ->setMethods(['getMetaBoxInstance'])
             ->getMockForAbstractClass();
@@ -100,9 +110,12 @@ class PostTypeBaseTest extends TestCase
             ->will($this->returnValue($metaBox));
 
 
+        /*
+         * Use reflection to configure instance of the PostTypeBase and execute boot method
+         */
         $reflectPostType = new \ReflectionClass(PostTypeBase::class);
 
-        // Set Metaboxes list
+        // Set MetaBoxes list
         $metaBoxProperty = $reflectPostType->getProperty('metaBoxes');
         $metaBoxProperty->setAccessible(true);
         $metaBoxProperty->setValue($customPostType, [$metaBoxClassName]);
@@ -123,7 +136,8 @@ class PostTypeBaseTest extends TestCase
         $this->assertAttributeNotEmpty('metaBoxes', $customPostType);
         $this->assertAttributeEquals([
             RegisterPostType::class => $register,
-            $metaBoxClassName => $metaBox
+            $metaBoxClassName => $metaBox,
+            ColumnsFactory::class => $columnsFactory
         ],
             'resolved',
             $customPostType

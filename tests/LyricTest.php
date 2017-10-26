@@ -36,14 +36,14 @@ class LyricTest extends TestCase
             ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class, \Lyric\PostTypes\RegisterPostType::class)
             ->andReturnSelf();
 
-        $container->shouldReceive('withArgument')
+        $container->shouldReceive('add')
             ->once()
-            ->with(Mockery::type(\League\Container\Argument\RawArgument::class))
+            ->with(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class, \Lyric\MetaBox\MetaBoxBuilder::class)
             ->andReturnSelf();
 
         $container->shouldReceive('add')
             ->once()
-            ->with(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class, \Lyric\MetaBox\MetaBoxBuilder::class)
+            ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, \Lyric\PostTypes\ColumnsFactory::class)
             ->andReturnSelf();
 
         $container->shouldReceive('add')
@@ -59,9 +59,6 @@ class LyricTest extends TestCase
         return $container;
     }
 
-    /**
-     * @
-     */
     public function test_get_lyric_instance()
     {
         $lyric = Lyric::make();
