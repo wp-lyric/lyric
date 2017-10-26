@@ -4,7 +4,7 @@ namespace Lyric\MetaBox;
 
 use Lyric\Contracts\MetaBox\MetaBoxBase as MetaBoxBaseContract;
 use Lyric\Contracts\MetaBox\MetaBoxBuilder;
-use Lyric\Contracts\Fields\FieldBuilder;
+use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\PostTypes\PostTypeBase;
 
 abstract class MetaBoxBase implements MetaBoxBaseContract
@@ -42,20 +42,20 @@ abstract class MetaBoxBase implements MetaBoxBaseContract
      * Carbon Fields instance
      * Used to builder the metaBox fields
      *
-     * @var FieldBuilder
+     * @var FieldFactory
      */
-    protected $fieldBuilder;
+    protected $fieldFactory;
 
     /**
      * Base constructor.
      *
      * @param MetaBoxBuilder $metaBoxBuilder
-     * @param FieldBuilder $fieldBuilder
+     * @param FieldFactory $fieldFactory
      */
-    public function __construct(MetaBoxBuilder $metaBoxBuilder, FieldBuilder $fieldBuilder)
+    public function __construct(MetaBoxBuilder $metaBoxBuilder, FieldFactory $fieldFactory)
     {
         $this->metaBoxBuilder = $metaBoxBuilder;
-        $this->fieldBuilder = $fieldBuilder;
+        $this->fieldFactory = $fieldFactory;
     }
 
     /**
@@ -70,11 +70,11 @@ abstract class MetaBoxBase implements MetaBoxBaseContract
     /**
      * Return array of the fields
      *
-     * @param FieldBuilder $fieldBuilder
+     * @param FieldFactory $fieldFactory
      *
      * @return array
      */
-    abstract protected function fields(FieldBuilder $fieldBuilder);
+    abstract protected function fields(FieldFactory $fieldFactory);
 
     /**
      * Show the container only on posts from the specified type(s).
@@ -99,7 +99,7 @@ abstract class MetaBoxBase implements MetaBoxBaseContract
         add_action('carbon_fields_register_fields', function () {
 
             $this->metaBoxBuilder->fields(
-                $this->fields($this->fieldBuilder)
+                $this->fields($this->fieldFactory)
             );
 
             $this->metaBoxBuilder->build();

@@ -6,7 +6,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 use Lyric\PostTypes\PostTypeBase;
 use Lyric\Contracts\PostTypes\RegisterPostType;
-use Lyric\Contracts\Fields\FieldBuilder;
+use Lyric\Contracts\Fields\FieldFactory;
 
 class PostTypeBaseTest extends TestCase
 {
@@ -54,7 +54,7 @@ class PostTypeBaseTest extends TestCase
         $register = Mockery::mock(RegisterPostType::class);
 
         $metaBoxBuilder = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class);
-        $fields = Mockery::mock(FieldBuilder::class);
+        $fields = Mockery::mock(FieldFactory::class);
 
         $metaBox = Mockery::mock(\Lyric\Contracts\Metabox\MetaBoxBase::class);
 
@@ -72,7 +72,7 @@ class PostTypeBaseTest extends TestCase
 
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\Fields\FieldBuilder::class)
+            ->with(\Lyric\Contracts\Fields\FieldFactory::class)
             ->andReturn($fields);
 
 

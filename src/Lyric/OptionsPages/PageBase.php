@@ -2,7 +2,7 @@
 
 namespace Lyric\OptionsPages;
 
-use Lyric\Contracts\Fields\FieldBuilder;
+use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\OptionsPages\PageBuilder;
 use Lyric\Contracts\OptionsPages\PageBase as PageBaseContract;
 
@@ -21,20 +21,20 @@ abstract class PageBase implements PageBaseContract
     protected $pageBuilder;
 
     /**
-     * @var FieldBuilder
+     * @var FieldFactory
      */
-    protected $fieldBuilder;
+    protected $fieldFactory;
 
     /**
      * PageBase constructor.
      *
      * @param PageBuilder $pageBuilder
-     * @param FieldBuilder $fieldBuilder
+     * @param FieldFactory $fieldFactory
      */
-    public function __construct(PageBuilder $pageBuilder, FieldBuilder $fieldBuilder)
+    public function __construct(PageBuilder $pageBuilder, FieldFactory $fieldFactory)
     {
         $this->pageBuilder = $pageBuilder;
-        $this->fieldBuilder = $fieldBuilder;
+        $this->fieldFactory = $fieldFactory;
     }
 
     /**
@@ -49,11 +49,11 @@ abstract class PageBase implements PageBaseContract
     /**
      * Return array of the Fields instances
      *
-     * @param FieldBuilder $fieldBuilder
+     * @param FieldFactory $fieldFactory
      *
      * @return array
      */
-    abstract protected function fields(FieldBuilder $fieldBuilder);
+    abstract protected function fields(FieldFactory $fieldFactory);
 
     /**
      * Bind option page to WordPress
@@ -66,7 +66,7 @@ abstract class PageBase implements PageBaseContract
 
         add_action('carbon_fields_register_fields', function () {
             $this->pageBuilder->fields(
-                $this->fields($this->fieldBuilder)
+                $this->fields($this->fieldFactory)
             );
 
             $this->pageBuilder->build();
@@ -82,7 +82,7 @@ abstract class PageBase implements PageBaseContract
                 $childPageInstance = $this->getOptionPageBaseInstance(
                     $childPage,
                     clone $childPageBuilder,
-                    $this->fieldBuilder
+                    $this->fieldFactory
                 );
 
                 if ($childPageInstance instanceof PageBaseContract) {

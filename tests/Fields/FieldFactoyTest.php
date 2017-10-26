@@ -3,10 +3,10 @@
 namespace LyricTests\Fields;
 
 use Mockery;
-use Lyric\Fields\FieldBuilder;
+use Lyric\Fields\FieldFactory;
 use PHPUnit\Framework\TestCase;
 
-class FieldsTest extends TestCase
+class FieldFactoyTest extends TestCase
 {
     public function tearDown()
     {
@@ -45,7 +45,7 @@ class FieldsTest extends TestCase
             ->with($fieldName, 'field-id', 'Field Title')
             ->andReturnSelf();
 
-        $fields = new FieldBuilder();
+        $fields = new FieldFactory();
 
         $this->assertInstanceOf(
             \Carbon_Fields\Field\Field::class,
@@ -62,7 +62,7 @@ class FieldsTest extends TestCase
             ->with('date_time', 'field-id', 'Field Title')
             ->andReturnSelf();
 
-        $fields = new FieldBuilder();
+        $fields = new FieldFactory();
 
         $this->assertInstanceOf(
             \Carbon_Fields\Field\Field::class,
@@ -80,7 +80,7 @@ class FieldsTest extends TestCase
             ->with('footer_scripts', 'field-id', 'Field Title')
             ->andReturnSelf();
 
-        $fields = new FieldBuilder();
+        $fields = new FieldFactory();
 
         $this->assertInstanceOf(
             \Carbon_Fields\Field\Field::class,
@@ -98,7 +98,7 @@ class FieldsTest extends TestCase
             ->with('header_scripts', 'field-id', 'Field Title')
             ->andReturnSelf();
 
-        $fields = new FieldBuilder();
+        $fields = new FieldFactory();
 
         $this->assertInstanceOf(
             \Carbon_Fields\Field\Field::class,
@@ -116,7 +116,7 @@ class FieldsTest extends TestCase
             ->with('set', 'field-id', 'Field Title')
             ->andReturnSelf();
 
-        $fields = new FieldBuilder();
+        $fields = new FieldFactory();
 
         $this->assertInstanceOf(
             \Carbon_Fields\Field\Field::class,
@@ -134,7 +134,7 @@ class FieldsTest extends TestCase
             ->with('radio_image', 'field-id', 'Field Title')
             ->andReturnSelf();
 
-        $fields = new FieldBuilder();
+        $fields = new FieldFactory();
 
         $this->assertInstanceOf(
             \Carbon_Fields\Field\Field::class,
@@ -152,7 +152,7 @@ class FieldsTest extends TestCase
             ->with('rich_text', 'field-id', 'Field Title')
             ->andReturnSelf();
 
-        $fields = new FieldBuilder();
+        $fields = new FieldFactory();
 
         $this->assertInstanceOf(
             \Carbon_Fields\Field\Field::class,

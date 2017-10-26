@@ -2,7 +2,7 @@
 
 namespace LyricTests\OptionsPages;
 
-use Lyric\Contracts\Fields\FieldBuilder;
+use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\OptionsPages\PageBuilder;
 use Lyric\OptionsPages\PageBase;
 use PHPUnit\Framework\TestCase;
@@ -30,7 +30,7 @@ class PageBaseTest extends TestCase
     {
         $builder = Mockery::mock(PageBuilder::class);
 
-        $fields = Mockery::mock(FieldBuilder::class);
+        $fields = Mockery::mock(FieldFactory::class);
 
         $optionsPageMain = Mockery::mock(PageBase::class,
             [$builder, $fields])->shouldAllowMockingProtectedMethods()->makePartial();
@@ -43,7 +43,7 @@ class PageBaseTest extends TestCase
 
         $optionsPageMain->shouldReceive('fields')
             ->once()
-            ->with(Mockery::type(FieldBuilder::class))
+            ->with(Mockery::type(FieldFactory::class))
             ->andReturn([$fields]);
 
 
@@ -72,7 +72,7 @@ class PageBaseTest extends TestCase
     {
         $builder = Mockery::mock(PageBuilder::class);
 
-        $fields = Mockery::mock(FieldBuilder::class);
+        $fields = Mockery::mock(FieldFactory::class);
 
         $optionsPageMain = Mockery::mock(PageBase::class, [$builder, $fields])->shouldAllowMockingProtectedMethods()->makePartial();
 
@@ -86,7 +86,7 @@ class PageBaseTest extends TestCase
 
         $optionsPageMain->shouldReceive('getOptionPageBaseInstance')
             ->once()
-            ->with(get_class($pageChild), Mockery::type(PageBuilder::class), Mockery::type(FieldBuilder::class))
+            ->with(get_class($pageChild), Mockery::type(PageBuilder::class), Mockery::type(FieldFactory::class))
             ->andReturn($pageChild);
 
 

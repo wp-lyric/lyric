@@ -1,26 +1,9 @@
 <?php
 
-namespace Lyric\Fields;
+namespace Lyric\Contracts\Fields;
 
-use Lyric\Contracts\Fields\FieldBuilder as FieldsContract;
-use Carbon_Fields\Field\Field as CarbonField;
-
-class FieldBuilder implements FieldsContract
+interface FieldFactory
 {
-    /**
-     * Get field
-     *
-     * @param $field
-     * @param $name
-     * @param $label
-     *
-     * @return mixed
-     */
-    protected function getFieldInstance($field, $name, $label)
-    {
-        return CarbonField::factory($field, $name, $label);
-    }
-
     /**
      * This field allows to select and reorder multiple post type posts, taxonomy terms, users or comments
      *
@@ -29,10 +12,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Association_Field
      */
-    public function association($name, $label)
-    {
-        return $this->getFieldInstance('association', $name, $label);
-    }
+    public function association($name, $label);
 
     /**
      * The checkbox field create a single tick-able option with a label next to it
@@ -42,10 +22,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Checkbox_Field
      */
-    public function checkbox($name, $label)
-    {
-        return $this->getFieldInstance('checkbox', $name, $label);
-    }
+    public function checkbox($name, $label);
 
     /**
      * Color picker field
@@ -55,10 +32,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Color_Field
      */
-    public function color($name, $label)
-    {
-        return $this->getFieldInstance('color', $name, $label);
-    }
+    public function color($name, $label);
 
     /**
      * Renders a date picker
@@ -68,10 +42,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Date_Field
      */
-    public function date($name, $label)
-    {
-        return $this->getFieldInstance('date', $name, $label);
-    }
+    public function date($name, $label);
 
     /**
      * Renders a date picker
@@ -81,10 +52,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Date_Time_Field
      */
-    public function dateTime($name, $label)
-    {
-        return $this->getFieldInstance('date_time', $name, $label);
-    }
+    public function dateTime($name, $label);
 
     /**
      * Renders a file upload field with a preview thumbnail of the uploaded file
@@ -94,10 +62,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\File_Field
      */
-    public function file($name, $label)
-    {
-        return $this->getFieldInstance('file', $name, $label);
-    }
+    public function file($name, $label);
 
     /**
      * Displays a text area, the contents of which will be automatically printed before the closing </body> of each
@@ -110,10 +75,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Footer_Scripts_Field
      */
-    public function footerScripts($name, $label)
-    {
-        return $this->getFieldInstance('footer_scripts', $name, $label);
-    }
+    public function footerScripts($name, $label);
 
     /**
      * Displays a text area, the contents of which will be automatically printed in the <head> of each page
@@ -125,10 +87,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Footer_Scripts_Field
      */
-    public function headerScripts($name, $label)
-    {
-        return $this->getFieldInstance('header_scripts', $name, $label);
-    }
+    public function headerScripts($name, $label);
 
     /**
      * Render custom HTML markup
@@ -138,10 +97,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Html_Field
      */
-    public function html($name, $label)
-    {
-        return $this->getFieldInstance('html', $name, $label);
-    }
+    public function html($name, $label);
 
     /**
      * Renders an image upload button with a preview thumbnail of the uploaded image
@@ -151,10 +107,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Image_Field
      */
-    public function image($name, $label = null)
-    {
-        return $this->getFieldInstance('image', $name, $label);
-    }
+    public function image($name, $label = null);
 
     /**
      * The map field provides a Google-powered map with an address search field
@@ -164,10 +117,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Map_Field
      */
-    public function map($name, $label = null)
-    {
-        return $this->getFieldInstance('map', $name, $label);
-    }
+    public function map($name, $label = null);
 
     /**
      * Creates a list of tick-able options (checkboxes)
@@ -177,10 +127,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Set_Field
      */
-    public function multiCheckbox($name, $label = null)
-    {
-        return $this->getFieldInstance('set', $name, $label);
-    }
+    public function multiCheckbox($name, $label = null);
 
     /**
      * Creates a radio selector with pre-defined options
@@ -190,10 +137,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Radio_Field
      */
-    public function radio($name, $label = null)
-    {
-        return $this->getFieldInstance('radio', $name, $label);
-    }
+    public function radio($name, $label = null);
 
     /**
      * Behaves exactly like a Radio field, but the passed option values should be fully qualified urls to image
@@ -204,10 +148,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Radio_Image_Field
      */
-    public function radioImage($name, $label = null)
-    {
-        return $this->getFieldInstance('radio_image', $name, $label);
-    }
+    public function radioImage($name, $label = null);
 
     /**
      * Creates a select box with pre-defined options
@@ -217,10 +158,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Select_Field
      */
-    public function select($name, $label = null)
-    {
-        return $this->getFieldInstance('select', $name, $label);
-    }
+    public function select($name, $label = null);
 
     /**
      * Creates visual separator between adjacent fields
@@ -230,10 +168,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Separator_Field
      */
-    public function separator($name, $label = null)
-    {
-        return $this->getFieldInstance('separator', $name, $label);
-    }
+    public function separator($name, $label = null);
 
     /**
      * This field renders the built-in WordPress tinyMCE WYSIWYG editor
@@ -243,10 +178,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Rich_Text_Field
      */
-    public function textEditor($name, $label = null)
-    {
-        return $this->getFieldInstance('rich_text', $name, $label);
-    }
+    public function textEditor($name, $label = null);
 
     /**
      * The text field renders a text input field
@@ -256,10 +188,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Text_Field
      */
-    public function text($name, $label = null)
-    {
-        return $this->getFieldInstance('text', $name, $label);
-    }
+    public function text($name, $label = null);
 
     /**
      * Multiline text input with HTML allowed
@@ -269,10 +198,7 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Textarea_Field
      */
-    public function textarea($name, $label = null)
-    {
-        return $this->getFieldInstance('textarea', $name, $label);
-    }
+    public function textarea($name, $label = null);
 
 
     /**
@@ -283,8 +209,5 @@ class FieldBuilder implements FieldsContract
      *
      * @return \Carbon_Fields\Field\Textarea_Field
      */
-    public function time($name, $label = null)
-    {
-        return $this->getFieldInstance('time', $name, $label);
-    }
+    public function time($name, $label = null);
 }

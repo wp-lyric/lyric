@@ -27,7 +27,8 @@ class LyricTest extends TestCase
     /**
      * @return \Mockery\MockInterface
      */
-    protected function get_mock_container() {
+    protected function get_mock_container()
+    {
         $container = Mockery::mock(Container::class);
 
         $container->shouldReceive('add')
@@ -52,7 +53,7 @@ class LyricTest extends TestCase
 
         $container->shouldReceive('share')
             ->once()
-            ->with(\Lyric\Contracts\Fields\FieldBuilder::class, \Lyric\Fields\FieldBuilder::class)
+            ->with(\Lyric\Contracts\Fields\FieldFactory::class, \Lyric\Fields\FieldFactory::class)
             ->andReturnSelf();
 
         return $container;
@@ -82,6 +83,7 @@ class LyricTest extends TestCase
     {
         $postType = Mockery::mock(PostTypeBase::class);
         $container = $this->get_mock_container();
+
         // Configure mocks
         $container->shouldReceive('share')
             ->once()
@@ -127,8 +129,8 @@ class LyricTest extends TestCase
 
     public function test_should_register_options_page()
     {
-        $optionsPage = Mockery::mock(PageBase::class);
         $container = $this->get_mock_container();
+
         // Configure mocks
         $container->shouldReceive('share')
             ->once()
@@ -142,7 +144,7 @@ class LyricTest extends TestCase
 
         $container->shouldReceive('withArgument')
             ->once()
-            ->with(\Lyric\Contracts\Fields\FieldBuilder::class)
+            ->with(\Lyric\Contracts\Fields\FieldFactory::class)
             ->andReturnSelf();
 
         $lyric = new Lyric($container);

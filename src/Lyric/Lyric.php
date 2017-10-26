@@ -79,7 +79,7 @@ class Lyric
 
         // Register Field Builder
         $this->container()
-            ->share(\Lyric\Contracts\Fields\FieldBuilder::class, \Lyric\Fields\FieldBuilder::class);
+            ->share(\Lyric\Contracts\Fields\FieldFactory::class, \Lyric\Fields\FieldFactory::class);
     }
 
     /**
@@ -143,7 +143,7 @@ class Lyric
     {
         $this->container()->share($optionsPageClass)
             ->withArgument(\Lyric\Contracts\OptionsPages\PageBuilder::class)
-            ->withArgument(\Lyric\Contracts\Fields\FieldBuilder::class);
+            ->withArgument(\Lyric\Contracts\Fields\FieldFactory::class);
 
         $this->optionsPageList[] = $optionsPageClass;
 

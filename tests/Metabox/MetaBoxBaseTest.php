@@ -4,7 +4,7 @@ namespace LyricTests\MetaBox;
 
 use Mockery;
 use Brain\Monkey;
-use Lyric\Contracts\Fields\FieldBuilder;
+use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\MetaBox\MetaBoxBuilder;
 use Brain\Monkey\Functions;
 use Lyric\MetaBox\MetaBoxBase;
@@ -28,7 +28,7 @@ class MetaBoxBaseTest extends TestCase
 
     public function test_set_post_type_name_using_post_type_instance()
     {
-        $fields = Mockery::mock(FieldBuilder::class);
+        $fields = Mockery::mock(FieldFactory::class);
 
         $metaBoxBuilder = Mockery::mock(MetaBoxBuilder::class);
 
@@ -48,7 +48,7 @@ class MetaBoxBaseTest extends TestCase
 
     public function test_should_register_extended_meta_box_class()
     {
-        $fields = Mockery::mock(FieldBuilder::class);
+        $fields = Mockery::mock(FieldFactory::class);
 
         $metaBoxBuilder = Mockery::mock(MetaBoxBuilder::class);
 
@@ -66,7 +66,7 @@ class MetaBoxBaseTest extends TestCase
 
         $metaBox->shouldReceive('fields')
             ->once()
-            ->with(Mockery::type(FieldBuilder::class))
+            ->with(Mockery::type(FieldFactory::class))
             ->andReturn(['field-one']);
 
 

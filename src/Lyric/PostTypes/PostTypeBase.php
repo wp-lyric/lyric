@@ -5,7 +5,7 @@ namespace Lyric\PostTypes;
 use Lyric\Contracts\PostTypes\PostTypeBase as PostTypeBaseContract;
 use League\Container\ContainerInterface;
 use Lyric\Contracts\PostTypes\RegisterPostType;
-use Lyric\Contracts\Fields\FieldBuilder;
+use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Support\Strings;
 
 abstract class PostTypeBase implements PostTypeBaseContract
@@ -53,7 +53,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
      * Builder Post Type object
      *
      * @param RegisterPostType $register
-     * @param FieldBuilder $fields
+     * @param FieldFactory $fields
      */
     final protected function boot()
     {
@@ -102,7 +102,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
             $metaBoxInstance = $this->getMetaBoxInstance(
                 $metaBoxBase,
                 $this->container->get(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class),
-                $this->container->get(FieldBuilder::class)
+                $this->container->get(FieldFactory::class)
             );
 
             if ($metaBoxInstance instanceof \Lyric\Contracts\Metabox\MetaBoxBase) {
@@ -116,13 +116,13 @@ abstract class PostTypeBase implements PostTypeBaseContract
      * Used to build meta-box instance
      *
      * @param $class
-     * @param $fieldBuilder
+     * @param $fieldFactory
      *
      * @return null|object
      */
-    protected function getMetaBoxInstance($class, $metaBoxBuilder, $fieldBuilder)
+    protected function getMetaBoxInstance($class, $metaBoxBuilder, $fieldFactory)
     {
-        return class_exists($class) ? new $class($metaBoxBuilder, $fieldBuilder) : null;
+        return class_exists($class) ? new $class($metaBoxBuilder, $fieldFactory) : null;
     }
 
     /**
