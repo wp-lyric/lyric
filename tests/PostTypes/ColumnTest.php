@@ -101,7 +101,7 @@ class ColumnTest extends TestCase
             });
 
         Functions\when('add_action')
-            ->alias(function ($actionName, $callable) use ($columnTitles) {
+            ->alias(function ($actionName, $callable) {
                 $callable('custom-column', 42);
             });
 
@@ -143,12 +143,12 @@ class ColumnTest extends TestCase
         ];
 
         Functions\when('add_filter')
-            ->alias(function ($filterName, $callable) use (&$columnTitles, &$columnFilters) {
+            ->alias(function ($filterName, $callable) use (&$columnTitles) {
                 $columnTitles = $callable($columnTitles);
             });
 
         Functions\when('add_action')
-            ->alias(function ($actionName, $callable) use ($columnTitles) {
+            ->alias(function ($actionName, $callable) {
                 $callable('custom-column', 42.2);
             });
 
@@ -161,6 +161,32 @@ class ColumnTest extends TestCase
             'other-column' => 'Lyric',
             'date' => 'Today',
             'lyric-column' => 'Lyric Data',
+        ], $columnTitles);
+    }
+
+    public function test_remove_column_of_the_post_type_admin()
+    {
+        // Settings
+        $columnTitles = [
+            'title' => 'Column - Post title',
+            'other-column' => 'Lyric',
+            'date' => 'Today'
+        ];
+
+        Functions\when('add_filter')
+            ->alias(function ($filterName, $callable) use (&$columnTitles) {
+                $columnTitles = $callable($columnTitles);
+            });
+
+        // Remove column
+        $column = new Column('post-type', 'title');
+        $column->remove()->bind();
+
+        // Do asserts
+        $this->assertAttributeEquals(true, 'removeColumn', $column);
+        $this->assertEquals([
+            'other-column' => 'Lyric',
+            'date' => 'Today',
         ], $columnTitles);
     }
 }

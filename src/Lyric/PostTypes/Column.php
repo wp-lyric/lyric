@@ -64,6 +64,13 @@ class Column
     protected $metaKey;
 
     /**
+     * Column is marked to be removed
+     *
+     * @var bool
+     */
+    protected $removeColumn = false;
+
+    /**
      * Column constructor.
      *
      * @param $postType
@@ -148,10 +155,32 @@ class Column
     }
 
     /**
+     * Mark column to be removed
+     *
+     * @return $this
+     */
+    public function remove()
+    {
+        $this->removeColumn = true;
+
+        return $this;
+    }
+
+    /**
      * Bind columns to WordPress
      */
     public function bind()
     {
+        if($this->removeColumn) {
+            add_filter("manage_{$this->postType}_posts_columns", function ($columns) {
+                unset($columns[$this->columnId]);
+
+                return $columns;
+            });
+
+            return $this;
+        }
+
         add_filter("manage_{$this->postType}_posts_columns", function ($columns) {
             $columns = $this->resolveColumns($columns, $this->columnId, $this->title, $this->next, $this->position);
 
@@ -174,7 +203,6 @@ class Column
                 return $columns;
             });
         }
-
     }
 
     /**

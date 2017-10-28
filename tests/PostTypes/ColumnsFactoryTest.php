@@ -33,6 +33,18 @@ class ColumnsFactoryTest extends TestCase
         $this->assertAttributeContainsOnly(Column::class, 'columns', $columnFactory);
     }
 
+    public function test_remove_column()
+    {
+        $columnFactory = new ColumnsFactory('post-type');
+        $column = $columnFactory->removeColumn('column-id');
+
+        $this->assertAttributeEquals('column-id', 'columnId', $column);
+        $this->assertAttributeEquals(true, 'removeColumn', $column);
+
+        $this->assertAttributeNotEmpty('columns', $columnFactory);
+        $this->assertAttributeContainsOnly(Column::class, 'columns', $columnFactory);
+    }
+
     public function test_should_build_all_registered_columns()
     {
         $column1 = Mockery::mock('Lyric\PostTypes\Column');

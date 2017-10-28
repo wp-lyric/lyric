@@ -50,6 +50,21 @@ class ColumnsFactory implements ColumnsFactoryContract
     }
 
     /**
+     * Remove column
+     *
+     * @param $id
+     *
+     * @return Column
+     */
+    public function removeColumn($id)
+    {
+        $column = $this->addColumn('', $id);
+        $column->remove();
+
+        return $column;
+    }
+
+    /**
      * Bind all registered columns to WordPress
      */
     public function bind()

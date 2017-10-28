@@ -20,6 +20,15 @@ interface ColumnsFactory
     public function addColumn($title, $id = null);
 
     /**
+     * Remove column
+     *
+     * @param $id
+     *
+     * @return \Lyric\PostTypes\Column
+     */
+    public function removeColumn($id);
+
+    /**
      * Bind all registered columns to WordPress
      */
     public function bind();
