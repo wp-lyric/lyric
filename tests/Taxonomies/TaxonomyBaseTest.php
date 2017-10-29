@@ -43,11 +43,6 @@ class TaxonomyBaseTest extends TestCase
             ->with($taxonomyRegister)
             ->andReturn($taxonomyRegister);
 
-        $taxonomyBase->shouldReceive('fields')
-            ->once()
-            ->with(Mockery::type(FieldFactory::class))
-            ->andReturn(['field-one']);
-
         $taxonomyRegister->shouldReceive('assignNames')
             ->once()
             ->with('lyric-taxonomy')

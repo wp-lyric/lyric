@@ -68,10 +68,6 @@ class Lyric
         $this->container()
             ->add(\Lyric\Contracts\PostTypes\RegisterPostType::class, \Lyric\PostTypes\RegisterPostType::class);
 
-        // Register OptionsPage\Builder
-        $this->container()
-            ->add(\Lyric\Contracts\OptionsPages\PageBuilder::class, \Lyric\OptionsPages\PageBuilder::class);
-
         // Register MetaBox Builder
         $this->container()
             ->add(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class, \Lyric\MetaBox\MetaBoxBuilder::class);
@@ -79,6 +75,17 @@ class Lyric
         // Register ColumnsFactory
         $this->container()
             ->add(\Lyric\Contracts\PostTypes\ColumnsFactory::class, \Lyric\PostTypes\ColumnsFactory::class);
+
+        // Register TaxonomyFactory and TaxonomyRegister
+        $this->container()
+            ->add(\Lyric\Contracts\Taxonomies\TaxonomyRegister::class, \Lyric\Taxonomies\TaxonomyRegister::class);
+
+        $this->container()
+            ->add(\Lyric\Contracts\Taxonomies\TaxonomyFactory::class, \Lyric\Taxonomies\TaxonomyFactory::class);
+
+        // Register OptionsPage\Builder
+        $this->container()
+            ->add(\Lyric\Contracts\OptionsPages\PageBuilder::class, \Lyric\OptionsPages\PageBuilder::class);
 
         // Register Field Builder
         $this->container()

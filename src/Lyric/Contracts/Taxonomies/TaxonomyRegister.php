@@ -21,7 +21,7 @@ interface TaxonomyRegister
      *
      * @return $this
      */
-    public function addPostType($postType);
+    public function setPostType($postType);
 
     /**
      * Return taxonomy name

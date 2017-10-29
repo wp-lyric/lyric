@@ -28,6 +28,7 @@ class TaxonomyRegisterTest extends TestCase
         $taxonomy = new TaxonomyRegister('Tag', 'lyric-post-type');
 
 
+        $this->assertEquals('tags', $taxonomy->getName());
         $this->assertAttributeEquals('tags', 'taxonomyName', $taxonomy);
         $this->assertAttributeEquals('Tag', 'singular', $taxonomy);
         $this->assertAttributeEquals('Tags', 'plural', $taxonomy);
@@ -47,6 +48,7 @@ class TaxonomyRegisterTest extends TestCase
             'lyric-post-type'
         );
 
+        $this->assertEquals('lyric-tax', $taxonomy->getName());
         $this->assertAttributeEquals('lyric-tax', 'taxonomyName', $taxonomy);
         $this->assertAttributeEquals('Lyric Tax', 'singular', $taxonomy);
         $this->assertAttributeEquals('Taxonomies', 'plural', $taxonomy);
@@ -58,6 +60,7 @@ class TaxonomyRegisterTest extends TestCase
     {
         $taxonomy = new TaxonomyRegister(['name' => 'tag'], 'lyric-post-type');
 
+        $this->assertEquals('tag', $taxonomy->getName());
         $this->assertAttributeEquals('tag', 'taxonomyName', $taxonomy);
         $this->assertAttributeEquals('Tag', 'singular', $taxonomy);
         $this->assertAttributeEquals('Tags', 'plural', $taxonomy);

@@ -48,6 +48,16 @@ class LyricTest extends TestCase
 
         $container->shouldReceive('add')
             ->once()
+            ->with(\Lyric\Contracts\Taxonomies\TaxonomyRegister::class, \Lyric\Taxonomies\TaxonomyRegister::class)
+            ->andReturnSelf();
+
+        $container->shouldReceive('add')
+            ->once()
+            ->with(\Lyric\Contracts\Taxonomies\TaxonomyFactory::class, \Lyric\Taxonomies\TaxonomyFactory::class)
+            ->andReturnSelf();
+
+        $container->shouldReceive('add')
+            ->once()
             ->with(\Lyric\Contracts\OptionsPages\PageBuilder::class, \Lyric\OptionsPages\PageBuilder::class)
             ->andReturnSelf();
 

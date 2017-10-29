@@ -16,7 +16,7 @@ class PostTypeBaseTest extends TestCase
         Mockery::close();
     }
 
-    public function test_should_init_register_and_configure_post_type_name()
+    public function test_in_boot_is_necessary_configure_post_type_name_and_dependencies()
     {
         $container = Mockery::mock(\League\Container\ContainerInterface::class);
         $register = Mockery::mock(RegisterPostType::class);
@@ -38,7 +38,9 @@ class PostTypeBaseTest extends TestCase
             ->withNoArgs()
             ->andReturn('lyric-post-type');
 
-        $lyricPostType = Mockery::namedMock('LyricPostType', PostTypeBase::class.'[bind]', [$container])->makePartial();
+        $lyricPostType = Mockery::namedMock('LyricPostType', PostTypeBase::class)->makePartial();
+
+        $lyricPostType->boot($container);
 
         // Set post type name
         $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $lyricPostType);
@@ -55,21 +57,16 @@ class PostTypeBaseTest extends TestCase
     public function test_should_create_instance_metabox_and_save_local_container()
     {
         $container = Mockery::mock(\League\Container\ContainerInterface::class);
-        $register = Mockery::mock(RegisterPostType::class);
-        $columnsFactory = Mockery::mock(ColumnsFactory::class);
 
         $metaBoxBuilder = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class);
-        $fields = Mockery::mock(FieldFactory::class);
+        $fieldFactory = Mockery::mock(FieldFactory::class);
 
         $metaBox = Mockery::mock(\Lyric\Contracts\Metabox\MetaBoxBase::class);
 
+        $postTypeBase = Mockery::mock(PostTypeBase::class)->makePartial()->shouldAllowMockingProtectedMethods();
+
 
         // Configure mocks
-        $container->shouldReceive('get')
-            ->once()
-            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class, ['custom-post-type'])
-            ->andReturn($register);
-
         $container->shouldReceive('get')
             ->once()
             ->with(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class)
@@ -78,18 +75,7 @@ class PostTypeBaseTest extends TestCase
         $container->shouldReceive('get')
             ->once()
             ->with(\Lyric\Contracts\Fields\FieldFactory::class)
-            ->andReturn($fields);
-
-        $container->shouldReceive('get')
-            ->once()
-            ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, ['custom-post-type'])
-            ->andReturn($columnsFactory);
-
-        $register->shouldReceive('getName')
-            ->once()
-            ->withNoArgs()
-            ->andReturn('custom-post-type');
-
+            ->andReturn($fieldFactory);
 
         $metaBox->shouldReceive('setPostType')
             ->once()
@@ -98,49 +84,96 @@ class PostTypeBaseTest extends TestCase
 
         $metaBoxClassName = get_class($metaBox);
 
-
-        $customPostType = $this->getMockBuilder(PostTypeBase::class)
-            ->setMockClassName('CustomPostType')
-            ->disableOriginalConstructor()
-            ->setMethods(['getMetaBoxInstance'])
-            ->getMockForAbstractClass();
-
-        $customPostType->method('getMetaBoxInstance')
-            ->with($this->equalTo($metaBoxClassName), $this->equalTo($metaBoxBuilder), $this->equalTo($fields))
-            ->will($this->returnValue($metaBox));
-
+        $postTypeBase->shouldReceive('getMetaBoxInstance')
+            ->once()
+            ->with($metaBoxClassName, $metaBoxBuilder, $fieldFactory)
+            ->andReturn($metaBox);
 
         /*
          * Use reflection to configure instance of the PostTypeBase and execute boot method
          */
         $reflectPostType = new \ReflectionClass(PostTypeBase::class);
 
+        // Set container
+        $containerProperty = $reflectPostType->getProperty('container');
+        $containerProperty->setAccessible(true);
+        $containerProperty->setValue($postTypeBase, $container);
+
         // Set MetaBoxes list
         $metaBoxProperty = $reflectPostType->getProperty('metaBoxes');
         $metaBoxProperty->setAccessible(true);
-        $metaBoxProperty->setValue($customPostType, [$metaBoxClassName]);
+        $metaBoxProperty->setValue($postTypeBase, [$metaBoxClassName]);
+
+
+        // Invoke method to init metaBoxes
+        $postTypeBase->resolveMetaBoxes();
+
+
+        // Assertions
+        $this->assertAttributeNotEmpty('metaBoxes', $postTypeBase);
+        $this->assertAttributeEquals([
+            $metaBoxClassName => $metaBox,
+        ],
+            'resolved',
+            $postTypeBase
+        );
+    }
+
+    public function test_create_taxonomies_instances_and_save_to_bind()
+    {
+        $container = Mockery::mock(\League\Container\ContainerInterface::class);
+
+        $taxonomyFactory = Mockery::mock(\Lyric\Contracts\Taxonomies\TaxonomyFactory::class);
+
+        $postTypeBase = Mockery::mock(PostTypeBase::class)->makePartial()->shouldAllowMockingProtectedMethods();
+
+        $taxonomyClassName = get_class($taxonomyFactory);
+
+        // Configure mocks
+        $container->shouldReceive('get')
+            ->once()
+            ->with(\Lyric\Contracts\Taxonomies\TaxonomyFactory::class, [
+                \Lyric\Contracts\Taxonomies\TaxonomyRegister::class,
+                \Lyric\Contracts\Fields\FieldFactory::class,
+                'lyric-post-type'
+            ])
+            ->andReturn($taxonomyFactory);
+
+        $taxonomyFactory->shouldReceive('addTaxonomy')
+            ->once()
+            ->with('TaxonomyBaseExtended')
+            ->andReturnSelf();
+
+        $postTypeBase->shouldReceive('postTypeName')
+            ->once()
+            ->withNoArgs()
+            ->andReturn('lyric-post-type');
+
+        /*
+       * Use reflection to configure instance of the PostTypeBase and execute boot method
+       */
+        $reflectPostType = new \ReflectionClass(PostTypeBase::class);
 
         // Set container
         $containerProperty = $reflectPostType->getProperty('container');
         $containerProperty->setAccessible(true);
-        $containerProperty->setValue($customPostType, $container);
+        $containerProperty->setValue($postTypeBase, $container);
 
+        // Set MetaBoxes list
+        $metaBoxProperty = $reflectPostType->getProperty('taxonomies');
+        $metaBoxProperty->setAccessible(true);
+        $metaBoxProperty->setValue($postTypeBase, ['TaxonomyBaseExtended']);
 
-        // Invoke method to init metaBoxes
-        $bootMethod = $reflectPostType->getMethod('boot');
-        $bootMethod->setAccessible(true);
-        $bootMethod->invoke($customPostType);
-
+        // Execute
+        $postTypeBase->resolveTaxonomies();
 
         // Assertions
-        $this->assertAttributeNotEmpty('metaBoxes', $customPostType);
+        $this->assertAttributeNotEmpty('taxonomies', $postTypeBase);
         $this->assertAttributeEquals([
-            RegisterPostType::class => $register,
-            $metaBoxClassName => $metaBox,
-            ColumnsFactory::class => $columnsFactory
+            $taxonomyClassName => $taxonomyFactory,
         ],
             'resolved',
-            $customPostType
+            $postTypeBase
         );
     }
 

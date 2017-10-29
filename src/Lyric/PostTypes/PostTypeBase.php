@@ -25,6 +25,8 @@ abstract class PostTypeBase implements PostTypeBaseContract
      */
     protected $metaBoxes = [];
 
+    protected $taxonomies = [];
+
     /**
      * Container instance
      *
@@ -46,8 +48,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->container = $container;
-        $this->boot();
+        $this->boot($container);
     }
 
     /**
@@ -56,8 +57,10 @@ abstract class PostTypeBase implements PostTypeBaseContract
      * @param RegisterPostType $register
      * @param FieldFactory $fields
      */
-    final protected function boot()
+    final public function boot(ContainerInterface $container)
     {
+        $this->container = $container;
+
         // Resolve post type register
         $register = $this->registerPostTypeNames();
         $this->resolved[RegisterPostType::class] = $this->postType($register);
@@ -65,6 +68,11 @@ abstract class PostTypeBase implements PostTypeBaseContract
         // Resolve meta-boxes
         if (!empty($this->metaBoxes)) {
             $this->resolveMetaBoxes();
+        }
+
+        // Resolve taxonomies
+        if (!empty($this->taxonomies)) {
+            $this->resolveTaxonomies();
         }
 
         // Resolve columns
@@ -94,7 +102,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
     /**
      * Builder meta box instances and register objects
      */
-    final protected function resolveMetaBoxes()
+    final public function resolveMetaBoxes()
     {
         foreach ($this->metaBoxes as $metaBoxBase) {
             $metaBoxInstance = $this->getMetaBoxInstance(
@@ -121,6 +129,24 @@ abstract class PostTypeBase implements PostTypeBaseContract
     protected function getMetaBoxInstance($class, $metaBoxBuilder, $fieldFactory)
     {
         return class_exists($class) ? new $class($metaBoxBuilder, $fieldFactory) : null;
+    }
+
+    final public function resolveTaxonomies()
+    {
+        $taxonomyFactory = $this->container->get(
+            \Lyric\Contracts\Taxonomies\TaxonomyFactory::class,
+            [
+                \Lyric\Contracts\Taxonomies\TaxonomyRegister::class,
+                \Lyric\Contracts\Fields\FieldFactory::class,
+                $this->postTypeName()
+            ]
+        );
+
+        foreach ($this->taxonomies as $taxonomy) {
+            $taxonomyFactory->addTaxonomy($taxonomy);
+        }
+
+        $this->resolved[get_class($taxonomyFactory)] = $taxonomyFactory;
     }
 
     /**
