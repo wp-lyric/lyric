@@ -4,7 +4,7 @@ namespace LyricTests\Taxonomies;
 
 use Lyric\Taxonomies\TaxonomyBase;
 use Lyric\Contracts\Fields\FieldFactory;
-use Lyric\Taxonomies\TaxonomyRegister;
+use Lyric\Contracts\Taxonomies\TaxonomyRegister;
 use PHPUnit\Framework\TestCase;
 use Mockery;
 use Brain\Monkey;
@@ -53,6 +53,11 @@ class TaxonomyBaseTest extends TestCase
             ->with('lyric-taxonomy')
             ->andReturnSelf();
 
+        $taxonomyRegister->shouldReceive('getName')
+            ->twice()
+            ->withNoArgs()
+            ->andReturn('lyric-taxonomies');
+
         $taxonomyRegister->shouldReceive('bind')
             ->once()
             ->withNoArgs()
@@ -67,12 +72,12 @@ class TaxonomyBaseTest extends TestCase
 
         $carbonContainer->shouldReceive('factory')
             ->once()
-            ->with('term_meta', 'lyric-taxonomy')
+            ->with('term_meta', 'lyric-taxonomies')
             ->andReturnSelf();
 
         $carbonContainer->shouldReceive('where')
             ->once()
-            ->with('term_taxonomy', '=', 'lyric-taxonomy')
+            ->with('term_taxonomy', '=', 'lyric-taxonomies')
             ->andReturnSelf();
 
         $carbonContainer->shouldReceive('add_fields')

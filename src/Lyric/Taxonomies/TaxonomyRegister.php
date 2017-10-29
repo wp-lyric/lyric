@@ -2,9 +2,10 @@
 
 namespace Lyric\Taxonomies;
 
+use Lyric\Contracts\Taxonomies\TaxonomyRegister as TaxonomyRegisterContract;
 use Lyric\Support\Strings;
 
-class TaxonomyRegister
+class TaxonomyRegister implements TaxonomyRegisterContract
 {
 
     /**
@@ -168,6 +169,16 @@ class TaxonomyRegister
     }
 
     /**
+     * Return taxonomy name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->taxonomyName;
+    }
+
+    /**
      * Set post type slug
      *
      * @param string $slug
@@ -274,5 +285,4 @@ class TaxonomyRegister
             }
         }, 1);
     }
-
 }

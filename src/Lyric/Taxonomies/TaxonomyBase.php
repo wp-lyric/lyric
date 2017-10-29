@@ -2,6 +2,7 @@
 
 namespace Lyric\Taxonomies;
 
+use Lyric\Contracts\Taxonomies\TaxonomyRegister;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Support\Strings;
 use Carbon_Fields\Container\Container;
@@ -98,7 +99,7 @@ abstract class TaxonomyBase
 
         add_action('carbon_fields_register_fields', function () {
             $this->getCarbonFieldContainer()
-                ->where('term_taxonomy', '=', $this->taxonomyName)
+                ->where('term_taxonomy', '=', $this->taxonomyRegister->getName())
                 ->add_fields(
                     $this->fields($this->fieldFactory)
                 );
@@ -112,6 +113,6 @@ abstract class TaxonomyBase
      */
     protected function getCarbonFieldContainer()
     {
-        return Container::factory('term_meta', $this->taxonomyName);
+        return Container::factory('term_meta', $this->taxonomyRegister->getName());
     }
 }
