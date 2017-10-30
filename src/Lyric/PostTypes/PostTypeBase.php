@@ -105,37 +105,30 @@ abstract class PostTypeBase implements PostTypeBaseContract
     }
 
     /**
-     * Builder meta box instances and register objects
+     * Register meta-boxes in MetaBoxFactory
      */
     final public function resolveMetaBoxes()
     {
-        foreach ($this->metaBoxes as $metaBoxBase) {
-            $metaBoxInstance = $this->getMetaBoxInstance(
-                $metaBoxBase,
-                $this->container->get(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class),
-                $this->container->get(FieldFactory::class)
-            );
+        $metaBoxFactory = $this->container->get(
+            \Lyric\Contracts\MetaBox\MetaBoxFactory::class,
+            [
+                \Lyric\Contracts\MetaBox\MetaBoxBuilder::class,
+                \Lyric\Contracts\Fields\FieldFactory::class,
+                $this->postTypeName()
+            ]
+        );
 
-            if ($metaBoxInstance instanceof \Lyric\Contracts\Metabox\MetaBoxBase) {
-                $metaBoxInstance->setPostType($this);
-                $this->resolved[$metaBoxBase] = $metaBoxInstance;
-            }
+
+        foreach ($this->metaBoxes as $metaBox) {
+            $metaBoxFactory->addMetaBox($metaBox);
         }
+
+        $this->resolved[get_class($metaBoxFactory)] = $metaBoxFactory;
     }
 
     /**
-     * Used to build meta-box instance
-     *
-     * @param $class
-     * @param $fieldFactory
-     *
-     * @return null|object
+     * Register taxonomies in TaxonomyFactory
      */
-    protected function getMetaBoxInstance($class, $metaBoxBuilder, $fieldFactory)
-    {
-        return class_exists($class) ? new $class($metaBoxBuilder, $fieldFactory) : null;
-    }
-
     final public function resolveTaxonomies()
     {
         $taxonomyFactory = $this->container->get(

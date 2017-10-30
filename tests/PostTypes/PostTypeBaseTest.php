@@ -58,10 +58,7 @@ class PostTypeBaseTest extends TestCase
     {
         $container = Mockery::mock(\League\Container\ContainerInterface::class);
 
-        $metaBoxBuilder = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class);
-        $fieldFactory = Mockery::mock(FieldFactory::class);
-
-        $metaBox = Mockery::mock(\Lyric\Contracts\Metabox\MetaBoxBase::class);
+        $metaBoxFactory = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxFactory::class);
 
         $postTypeBase = Mockery::mock(PostTypeBase::class)->makePartial()->shouldAllowMockingProtectedMethods();
 
@@ -69,25 +66,28 @@ class PostTypeBaseTest extends TestCase
         // Configure mocks
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class)
-            ->andReturn($metaBoxBuilder);
+            ->with(
+                \Lyric\Contracts\MetaBox\MetaBoxFactory::class,
+                [
+                    \Lyric\Contracts\MetaBox\MetaBoxBuilder::class,
+                    \Lyric\Contracts\Fields\FieldFactory::class,
+                    'lyric-post-type'
+                ]
+            )
+            ->andReturn($metaBoxFactory);
 
-        $container->shouldReceive('get')
+        $metaBoxFactory->shouldReceive('addMetaBox')
             ->once()
-            ->with(\Lyric\Contracts\Fields\FieldFactory::class)
-            ->andReturn($fieldFactory);
-
-        $metaBox->shouldReceive('setPostType')
-            ->once()
-            ->with(Mockery::type(PostTypeBase::class))
+            ->with('MetaBoxBaseExtended')
             ->andReturnSelf();
 
-        $metaBoxClassName = get_class($metaBox);
 
-        $postTypeBase->shouldReceive('getMetaBoxInstance')
+        $postTypeBase->shouldReceive('postTypeName')
             ->once()
-            ->with($metaBoxClassName, $metaBoxBuilder, $fieldFactory)
-            ->andReturn($metaBox);
+            ->withNoArgs()
+            ->andReturn('lyric-post-type');
+
+        $metaBoxClassName = get_class($metaBoxFactory);
 
         /*
          * Use reflection to configure instance of the PostTypeBase and execute boot method
@@ -102,7 +102,7 @@ class PostTypeBaseTest extends TestCase
         // Set MetaBoxes list
         $metaBoxProperty = $reflectPostType->getProperty('metaBoxes');
         $metaBoxProperty->setAccessible(true);
-        $metaBoxProperty->setValue($postTypeBase, [$metaBoxClassName]);
+        $metaBoxProperty->setValue($postTypeBase, ['MetaBoxBaseExtended']);
 
 
         // Invoke method to init metaBoxes
@@ -112,7 +112,7 @@ class PostTypeBaseTest extends TestCase
         // Assertions
         $this->assertAttributeNotEmpty('metaBoxes', $postTypeBase);
         $this->assertAttributeEquals([
-            $metaBoxClassName => $metaBox,
+            $metaBoxClassName => $metaBoxFactory,
         ],
             'resolved',
             $postTypeBase

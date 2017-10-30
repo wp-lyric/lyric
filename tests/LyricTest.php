@@ -43,6 +43,11 @@ class LyricTest extends TestCase
 
         $container->shouldReceive('add')
             ->once()
+            ->with(\Lyric\Contracts\MetaBox\MetaBoxFactory::class, \Lyric\MetaBox\MetaBoxFactory::class)
+            ->andReturnSelf();
+
+        $container->shouldReceive('add')
+            ->once()
             ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, \Lyric\PostTypes\ColumnsFactory::class)
             ->andReturnSelf();
 
