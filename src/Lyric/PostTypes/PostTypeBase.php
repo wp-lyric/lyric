@@ -4,7 +4,7 @@ namespace Lyric\PostTypes;
 
 use Lyric\Contracts\PostTypes\PostTypeBase as PostTypeBaseContract;
 use League\Container\ContainerInterface;
-use Lyric\Contracts\PostTypes\RegisterPostType;
+use Lyric\Contracts\PostTypes\PostTypeRegister;
 use Lyric\Contracts\PostTypes\ColumnsFactory;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Support\Strings;
@@ -25,6 +25,11 @@ abstract class PostTypeBase implements PostTypeBaseContract
      */
     protected $metaBoxes = [];
 
+    /**
+     * List of the TaxonomyBase instances
+     *
+     * @var array
+     */
     protected $taxonomies = [];
 
     /**
@@ -54,7 +59,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
     /**
      * Builder Post Type object
      *
-     * @param RegisterPostType $register
+     * @param PostTypeRegister $register
      * @param FieldFactory $fields
      */
     final public function boot(ContainerInterface $container)
@@ -63,7 +68,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
 
         // Resolve post type register
         $register = $this->registerPostTypeNames();
-        $this->resolved[RegisterPostType::class] = $this->postType($register);
+        $this->resolved[PostTypeRegister::class] = $this->postType($register);
 
         // Resolve meta-boxes
         if (!empty($this->metaBoxes)) {
@@ -83,9 +88,9 @@ abstract class PostTypeBase implements PostTypeBaseContract
     /**
      * Register the post type name
      *
-     * @param RegisterPostType $register
+     * @param PostTypeRegister $register
      *
-     * @return RegisterPostType
+     * @return PostTypeRegister
      */
     final protected function registerPostTypeNames()
     {
@@ -94,7 +99,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
             $this->postTypeName = Strings::slug($className);
         }
 
-        $register = $this->container->get(\Lyric\Contracts\PostTypes\RegisterPostType::class, [$this->postTypeName]);
+        $register = $this->container->get(\Lyric\Contracts\PostTypes\PostTypeRegister::class, [$this->postTypeName]);
 
         return $register;
     }
@@ -156,17 +161,17 @@ abstract class PostTypeBase implements PostTypeBaseContract
      */
     public function postTypeName()
     {
-        return $this->resolved[RegisterPostType::class]->getName();
+        return $this->resolved[PostTypeRegister::class]->getName();
     }
 
     /**
      * Configure Post Type
      *
-     * @param RegisterPostType $register
+     * @param PostTypeRegister $register
      *
-     * @return RegisterPostType
+     * @return PostTypeRegister
      */
-    protected function postType(RegisterPostType $register)
+    protected function postType(PostTypeRegister $register)
     {
         return $register;
     }

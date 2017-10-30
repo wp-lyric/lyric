@@ -2,7 +2,7 @@
 
 namespace Lyric\Contracts\PostTypes;
 
-interface RegisterPostType
+interface PostTypeRegister
 {
     /**
      * Assign the post type names.

@@ -6,9 +6,9 @@ use Mockery;
 use Brain\Monkey;
 use Brain\Monkey\Functions;
 use PHPUnit\Framework\TestCase;
-use Lyric\PostTypes\RegisterPostType;
+use Lyric\PostTypes\PostTypeRegister;
 
-class RegisterPostTypeTest extends TestCase
+class PostTypeRegisterTest extends TestCase
 {
 
     protected function setUp()
@@ -25,7 +25,7 @@ class RegisterPostTypeTest extends TestCase
 
     public function test_build_names_used_in_post_type_with_single_option()
     {
-        $register = new RegisterPostType('lyric-post-type');
+        $register = new PostTypeRegister('lyric-post-type');
 
         $this->assertAttributeEquals('lyric-post-types', 'postTypeName', $register);
         $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
@@ -39,7 +39,7 @@ class RegisterPostTypeTest extends TestCase
      */
     public function test_should_throw_exception_if_post_type_name_has_invalid_format()
     {
-        new RegisterPostType(true);
+        new PostTypeRegister(true);
     }
 
     /**
@@ -48,12 +48,12 @@ class RegisterPostTypeTest extends TestCase
      */
     public function test_should_throw_exception_if_required_name_not_exist()
     {
-        new RegisterPostType([]);
+        new PostTypeRegister([]);
     }
 
     public function test_build_names_used_in_post_type_with_array_option()
     {
-        $register = new RegisterPostType([
+        $register = new PostTypeRegister([
             'name' => 'lyric',
             'singular' => 'Lyric Post Type',
             'plural' => 'Lyric Posts',
@@ -68,7 +68,7 @@ class RegisterPostTypeTest extends TestCase
 
     public function test_build_names_used_in_post_type_with_incomplete_array_option()
     {
-        $register = new RegisterPostType([
+        $register = new PostTypeRegister([
             'name' => 'lyric post type',
         ]);
 
@@ -80,7 +80,7 @@ class RegisterPostTypeTest extends TestCase
 
     public function test_rename_post_type()
     {
-        $register = new RegisterPostType('lyric-post-type');
+        $register = new PostTypeRegister('lyric-post-type');
 
         $this->assertAttributeEquals('lyric-post-types', 'postTypeName', $register);
         $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
@@ -93,14 +93,14 @@ class RegisterPostTypeTest extends TestCase
         $this->assertAttributeEquals('New Name', 'singular', $register);
         $this->assertAttributeEquals('New Names', 'plural', $register);
         $this->assertAttributeEquals('new-names', 'slug', $register);
-        $this->assertInstanceOf(RegisterPostType::class, $return);
+        $this->assertInstanceOf(PostTypeRegister::class, $return);
     }
 
     public function test_get_correctly_post_type_name()
     {
-        $registerOne = new RegisterPostType('lyric-post-type');
+        $registerOne = new PostTypeRegister('lyric-post-type');
 
-        $registerTwo = new RegisterPostType('lyric-post-type');
+        $registerTwo = new PostTypeRegister('lyric-post-type');
         $registerTwo->assignNames('lyric-post-type-two');
 
         $this->assertEquals('lyric-post-types', $registerOne->getName());
@@ -109,7 +109,7 @@ class RegisterPostTypeTest extends TestCase
 
     public function test_should_set_options()
     {
-        $register = new RegisterPostType('lyric-post-type');
+        $register = new PostTypeRegister('lyric-post-type');
 
         $return = $register->options([
             'has_archive' => true,
@@ -124,12 +124,12 @@ class RegisterPostTypeTest extends TestCase
             'options',
             $register
         );
-        $this->assertInstanceOf(RegisterPostType::class, $return);
+        $this->assertInstanceOf(PostTypeRegister::class, $return);
     }
 
     public function test_should_set_labels()
     {
-        $register = new RegisterPostType('lyric-post-type');
+        $register = new PostTypeRegister('lyric-post-type');
 
         $return = $register->labels([
             'name' => 'Lyric',
@@ -144,12 +144,12 @@ class RegisterPostTypeTest extends TestCase
             'labels',
             $register
         );
-        $this->assertInstanceOf(RegisterPostType::class, $return);
+        $this->assertInstanceOf(PostTypeRegister::class, $return);
     }
 
     public function test_should_set_slug()
     {
-        $register = new RegisterPostType('lyric-post-type');
+        $register = new PostTypeRegister('lyric-post-type');
 
         $register->slug('Lyric Posts');
 
@@ -167,14 +167,14 @@ class RegisterPostTypeTest extends TestCase
             $register
         );
 
-        $this->assertInstanceOf(RegisterPostType::class, $register->slug('return-instance'));
+        $this->assertInstanceOf(PostTypeRegister::class, $register->slug('return-instance'));
     }
 
     public function test_set_icon()
     {
-        $register = new RegisterPostType('lyric-post-type');
+        $register = new PostTypeRegister('lyric-post-type');
 
-        $this->assertInstanceOf(RegisterPostType::class, $register->icon('custom-icon'));
+        $this->assertInstanceOf(PostTypeRegister::class, $register->icon('custom-icon'));
 
 
         $this->assertAttributeEquals(
@@ -187,7 +187,7 @@ class RegisterPostTypeTest extends TestCase
 
     public function test_return_options_and_label_after_merge_default_and_configured()
     {
-        $register = new RegisterPostType('lyric-post-type');
+        $register = new PostTypeRegister('lyric-post-type');
 
         $expectedLabels = [
             'name' => 'Lyric',
@@ -255,7 +255,7 @@ class RegisterPostTypeTest extends TestCase
         Functions\when('__')
             ->returnArg(1);
 
-        $register = new RegisterPostType('lyric-post-type');
+        $register = new PostTypeRegister('lyric-post-type');
 
         $this->assertNull($register->bind());
     }
@@ -266,7 +266,7 @@ class RegisterPostTypeTest extends TestCase
             ->returnArg(1);
 
         $postTypeName = 'lyric-post-type';
-        $register = new RegisterPostType($postTypeName);
+        $register = new PostTypeRegister($postTypeName);
 
         $register->bind();
 

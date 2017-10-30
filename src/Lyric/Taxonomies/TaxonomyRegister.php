@@ -128,7 +128,7 @@ class TaxonomyRegister implements TaxonomyRegisterContract
      */
     public function setPostType($postType)
     {
-        if ($postType instanceof \Lyric\Contracts\PostTypes\RegisterPostType) {
+        if ($postType instanceof \Lyric\Contracts\PostTypes\PostTypeRegister) {
             $this->postType = $postType->getName();
 
             return $this;

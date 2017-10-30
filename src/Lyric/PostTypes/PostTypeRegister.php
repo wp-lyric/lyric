@@ -2,10 +2,10 @@
 
 namespace Lyric\PostTypes;
 
-use Lyric\Contracts\PostTypes\RegisterPostType as RegisterPostTypeContract;
+use Lyric\Contracts\PostTypes\PostTypeRegister as PostTypeRegisterContract;
 use Lyric\Support\Strings;
 
-class RegisterPostType implements RegisterPostTypeContract
+class PostTypeRegister implements PostTypeRegisterContract
 {
     /**
      * The post type name.

@@ -89,7 +89,7 @@ class TaxonomyRegisterTest extends TestCase
 
     public function test_should_register_taxonomy_using_post_type_object()
     {
-        $register = Mockery::mock(\Lyric\Contracts\PostTypes\RegisterPostType::class);
+        $register = Mockery::mock(\Lyric\Contracts\PostTypes\PostTypeRegister::class);
 
         $register->shouldReceive('getName')
             ->once()

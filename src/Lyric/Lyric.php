@@ -66,7 +66,7 @@ class Lyric
     {
         // Register Post Type Register
         $this->container()
-            ->add(\Lyric\Contracts\PostTypes\RegisterPostType::class, \Lyric\PostTypes\RegisterPostType::class);
+            ->add(\Lyric\Contracts\PostTypes\PostTypeRegister::class, \Lyric\PostTypes\PostTypeRegister::class);
 
         // Register MetaBox Builder
         $this->container()

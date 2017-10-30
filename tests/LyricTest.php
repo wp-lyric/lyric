@@ -33,7 +33,7 @@ class LyricTest extends TestCase
 
         $container->shouldReceive('add')
             ->once()
-            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class, \Lyric\PostTypes\RegisterPostType::class)
+            ->with(\Lyric\Contracts\PostTypes\PostTypeRegister::class, \Lyric\PostTypes\PostTypeRegister::class)
             ->andReturnSelf();
 
         $container->shouldReceive('add')

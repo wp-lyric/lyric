@@ -5,7 +5,7 @@ namespace LyricTests\PostTypes;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Lyric\PostTypes\PostTypeBase;
-use Lyric\Contracts\PostTypes\RegisterPostType;
+use Lyric\Contracts\PostTypes\PostTypeRegister;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\PostTypes\ColumnsFactory;
 
@@ -19,13 +19,13 @@ class PostTypeBaseTest extends TestCase
     public function test_in_boot_is_necessary_configure_post_type_name_and_dependencies()
     {
         $container = Mockery::mock(\League\Container\ContainerInterface::class);
-        $register = Mockery::mock(RegisterPostType::class);
+        $register = Mockery::mock(PostTypeRegister::class);
         $columnsFactory = Mockery::mock(ColumnsFactory::class);
 
         // Configure Mocks
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\PostTypes\RegisterPostType::class, ['lyric-post-type'])
+            ->with(\Lyric\Contracts\PostTypes\PostTypeRegister::class, ['lyric-post-type'])
             ->andReturn($register);
 
         $container->shouldReceive('get')
@@ -47,7 +47,7 @@ class PostTypeBaseTest extends TestCase
 
         //
         $this->assertAttributeEquals(
-            [RegisterPostType::class => $register, ColumnsFactory::class => $columnsFactory],
+            [PostTypeRegister::class => $register, ColumnsFactory::class => $columnsFactory],
             'resolved',
             $lyricPostType
         );
@@ -179,7 +179,7 @@ class PostTypeBaseTest extends TestCase
 
     public function test_should_bind_post_type_to_wordpress()
     {
-        $register = Mockery::mock(RegisterPostType::class);
+        $register = Mockery::mock(PostTypeRegister::class);
         $metaBox = Mockery::mock(\Lyric\Contracts\Metabox\MetaBoxBase::class);
 
         // Configure mocks
@@ -206,7 +206,7 @@ class PostTypeBaseTest extends TestCase
         $metaBoxProperty = $reflectPostType->getProperty('resolved');
         $metaBoxProperty->setAccessible(true);
         $metaBoxProperty->setValue($customPostType, [
-            RegisterPostType::class => $register,
+            PostTypeRegister::class => $register,
             \Lyric\Metabox\MetaBoxBase::class => $metaBox
         ]);
 
