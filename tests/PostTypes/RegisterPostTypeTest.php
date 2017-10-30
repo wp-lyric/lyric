@@ -27,10 +27,10 @@ class RegisterPostTypeTest extends TestCase
     {
         $register = new RegisterPostType('lyric-post-type');
 
-        $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $register);
+        $this->assertAttributeEquals('lyric-post-types', 'postTypeName', $register);
         $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
         $this->assertAttributeEquals('Lyric Post Types', 'plural', $register);
-        $this->assertAttributeEquals('lyric-post-type', 'slug', $register);
+        $this->assertAttributeEquals('lyric-post-types', 'slug', $register);
     }
 
     /**
@@ -44,7 +44,7 @@ class RegisterPostTypeTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The [name] key is required in Lyric\PostTypes\RegisterPostType::names
+     * @expectedExceptionMessage Using array the [name] key is required to the post type
      */
     public function test_should_throw_exception_if_required_name_not_exist()
     {
@@ -75,24 +75,24 @@ class RegisterPostTypeTest extends TestCase
         $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $register);
         $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
         $this->assertAttributeEquals('Lyric Post Types', 'plural', $register);
-        $this->assertAttributeEquals('lyric-post-type', 'slug', $register);
+        $this->assertAttributeEquals('lyric-post-types', 'slug', $register);
     }
 
     public function test_rename_post_type()
     {
         $register = new RegisterPostType('lyric-post-type');
 
-        $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $register);
+        $this->assertAttributeEquals('lyric-post-types', 'postTypeName', $register);
         $this->assertAttributeEquals('Lyric Post Type', 'singular', $register);
         $this->assertAttributeEquals('Lyric Post Types', 'plural', $register);
-        $this->assertAttributeEquals('lyric-post-type', 'slug', $register);
+        $this->assertAttributeEquals('lyric-post-types', 'slug', $register);
 
         $return = $register->assignNames('new-name');
 
-        $this->assertAttributeEquals('new-name', 'postTypeName', $register);
+        $this->assertAttributeEquals('new-names', 'postTypeName', $register);
         $this->assertAttributeEquals('New Name', 'singular', $register);
         $this->assertAttributeEquals('New Names', 'plural', $register);
-        $this->assertAttributeEquals('new-name', 'slug', $register);
+        $this->assertAttributeEquals('new-names', 'slug', $register);
         $this->assertInstanceOf(RegisterPostType::class, $return);
     }
 
@@ -103,8 +103,8 @@ class RegisterPostTypeTest extends TestCase
         $registerTwo = new RegisterPostType('lyric-post-type');
         $registerTwo->assignNames('lyric-post-type-two');
 
-        $this->assertEquals('lyric-post-type', $registerOne->getName());
-        $this->assertEquals('lyric-post-type-two', $registerTwo->getName());
+        $this->assertEquals('lyric-post-types', $registerOne->getName());
+        $this->assertEquals('lyric-post-type-twos', $registerTwo->getName());
     }
 
     public function test_should_set_options()
@@ -202,7 +202,7 @@ class RegisterPostTypeTest extends TestCase
             'menu_icon' => '',
             'menu_position' => 42,
             'rewrite' => [
-                'slug' => 'lyric-post-type'
+                'slug' => 'lyric-post-types'
             ],
         ];
 
@@ -220,7 +220,7 @@ class RegisterPostTypeTest extends TestCase
 
     public function test_register_post_type()
     {
-        $postTypeName = 'lyric-post-type';
+        $postTypeName = 'lyric-post-types';
 
         $finalLabels = [
             'name' => 'Lyric Post Types',
@@ -233,7 +233,7 @@ class RegisterPostTypeTest extends TestCase
             'public' => true,
             'menu_icon' => '',
             'rewrite' => [
-                'slug' => 'lyric-post-type'
+                'slug' => 'lyric-post-types'
             ],
             'labels' => $finalLabels,
         ];

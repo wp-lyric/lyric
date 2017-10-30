@@ -57,7 +57,7 @@ class RegisterPostType implements RegisterPostTypeContract
     protected $labels = [];
 
     /**
-     * Register constructor.
+     * Register constructor
      *
      * @param  array|string $names
      */
@@ -79,10 +79,10 @@ class RegisterPostType implements RegisterPostTypeContract
         $this->validateNames($names);
 
         if (is_string($names)) {
-            $this->postTypeName = Strings::slug($names);
             $this->singular = $this->friendlyName($names);
             $this->plural = $this->singular . 's';
-            $this->slug($names);
+            $this->postTypeName = Strings::slug($this->plural);
+            $this->slug($this->plural);
 
             return $this;
         }
@@ -105,7 +105,7 @@ class RegisterPostType implements RegisterPostTypeContract
         if (isset($names['slug'])) {
             $this->slug($names['slug']);
         } else {
-            $this->slug($this->postTypeName);
+            $this->slug($this->plural);
         }
 
         return $this;
@@ -123,7 +123,7 @@ class RegisterPostType implements RegisterPostTypeContract
         }
 
         if (is_array($names) && !array_key_exists('name', $names)) {
-            throw new \InvalidArgumentException('The [name] key is required in ' . get_class($this) . '::names');
+            throw new \InvalidArgumentException('Using array the [name] key is required to the post type');
         }
     }
 
