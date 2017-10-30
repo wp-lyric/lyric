@@ -132,7 +132,7 @@ class Lyric
 
         $postTypeInstance = $this->container()->get($postTypeClass);
 
-        $this->postTypeList[$postTypeInstance->postTypeName()] = $postTypeClass;
+        $this->postTypeList[$postTypeInstance->getPostTypeName()] = $postTypeClass;
 
         return $this;
     }

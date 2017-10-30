@@ -3,17 +3,13 @@
 namespace Lyric\Taxonomies;
 
 use Lyric\Contracts\Taxonomies\TaxonomyRegister as TaxonomyRegisterContract;
+use Lyric\PostTypes\HasParentPostType;
 use Lyric\Support\Strings;
 
 class TaxonomyRegister implements TaxonomyRegisterContract
 {
 
-    /**
-     * Post type used to display taxonomy
-     *
-     * @var string
-     */
-    protected $postType;
+  use HasParentPostType;
 
     /**
      * Taxonomy name
@@ -118,27 +114,6 @@ class TaxonomyRegister implements TaxonomyRegisterContract
 
         return $this;
     }
-
-    /**
-     * Save post type used to display taxonomy
-     *
-     * @param $postType
-     *
-     * @return $this
-     */
-    public function setPostType($postType)
-    {
-        if ($postType instanceof \Lyric\Contracts\PostTypes\PostTypeRegister) {
-            $this->postType = $postType->getName();
-
-            return $this;
-        }
-
-        $this->postType = $postType;
-
-        return $this;
-    }
-
 
     /**
      * Validate post type names options

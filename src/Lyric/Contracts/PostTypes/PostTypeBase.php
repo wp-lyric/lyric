@@ -9,7 +9,7 @@ interface PostTypeBase
      *
      * @return string
      */
-    public function postTypeName();
+    public function getPostTypeName();
 
     /**
      * Bind Post Type to WordPress

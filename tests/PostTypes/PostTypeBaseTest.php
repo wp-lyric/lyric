@@ -22,6 +22,8 @@ class PostTypeBaseTest extends TestCase
         $register = Mockery::mock(PostTypeRegister::class);
         $columnsFactory = Mockery::mock(ColumnsFactory::class);
 
+        $lyricPostType = Mockery::namedMock('LyricPostType', PostTypeBase::class)->makePartial();
+
         // Configure Mocks
         $container->shouldReceive('get')
             ->once()
@@ -30,16 +32,10 @@ class PostTypeBaseTest extends TestCase
 
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, ['lyric-post-type'])
+            ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, [$lyricPostType])
             ->andReturn($columnsFactory);
 
-        $register->shouldReceive('getName')
-            ->once()
-            ->withNoArgs()
-            ->andReturn('lyric-post-type');
-
-        $lyricPostType = Mockery::namedMock('LyricPostType', PostTypeBase::class)->makePartial();
-
+        // Execute
         $lyricPostType->boot($container);
 
         // Set post type name
@@ -71,7 +67,7 @@ class PostTypeBaseTest extends TestCase
                 [
                     \Lyric\Contracts\MetaBox\MetaBoxBuilder::class,
                     \Lyric\Contracts\Fields\FieldFactory::class,
-                    'lyric-post-type'
+                    $postTypeBase
                 ]
             )
             ->andReturn($metaBoxFactory);
@@ -80,11 +76,6 @@ class PostTypeBaseTest extends TestCase
             ->once()
             ->with('MetaBoxBaseExtended')
             ->andReturnSelf();
-
-        $postTypeBase->shouldReceive('postTypeName')
-            ->once()
-            ->withNoArgs()
-            ->andReturn('lyric-post-type');
 
         $metaBoxClassName = get_class($metaBoxFactory);
 
@@ -134,7 +125,7 @@ class PostTypeBaseTest extends TestCase
             ->with(\Lyric\Contracts\Taxonomies\TaxonomyFactory::class, [
                 \Lyric\Contracts\Taxonomies\TaxonomyRegister::class,
                 \Lyric\Contracts\Fields\FieldFactory::class,
-                'lyric-post-type'
+                $postTypeBase
             ])
             ->andReturn($taxonomyFactory);
 
@@ -142,11 +133,6 @@ class PostTypeBaseTest extends TestCase
             ->once()
             ->with('TaxonomyBaseExtended')
             ->andReturnSelf();
-
-        $postTypeBase->shouldReceive('postTypeName')
-            ->once()
-            ->withNoArgs()
-            ->andReturn('lyric-post-type');
 
         /*
        * Use reflection to configure instance of the PostTypeBase and execute boot method

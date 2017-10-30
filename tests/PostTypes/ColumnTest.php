@@ -29,7 +29,6 @@ class ColumnTest extends TestCase
             return 'This is columns to post with ID: ' . $postId;
         });
 
-        $this->assertAttributeEquals('post-type', 'postType', $column);
         $this->assertAttributeEquals('Column Title', 'title', $column);
         $this->assertAttributeEquals('column-title', 'columnId', $column);
         $this->assertAttributeInternalType('callable', 'callback', $column);

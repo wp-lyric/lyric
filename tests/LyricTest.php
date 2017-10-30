@@ -117,7 +117,7 @@ class LyricTest extends TestCase
             ->with(PostTypeBase::class)
             ->andReturn($postType);
 
-        $postType->shouldReceive('postTypeName')
+        $postType->shouldReceive('getPostTypeName')
             ->once()
             ->withNoArgs()
             ->andReturn('lyric-post-type');

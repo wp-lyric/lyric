@@ -43,32 +43,6 @@ class MetaBoxBuilderTest extends TestCase
         $this->assertAttributeEquals('advanced', 'context', $metaBoxBuilder);
     }
 
-    public function test_set_post_type_page_using_string()
-    {
-        $metaBoxBuilder = new MetaBoxBuilder();
-
-        $metaBoxBuilder->setPostType("lyric-post-type");
-
-        $this->assertAttributeEquals('lyric-post-type', 'postType', $metaBoxBuilder);
-    }
-
-    public function test_set_post_type_page_using_object()
-    {
-        $postType = Mockery::mock(PostTypeBase::class);
-
-        $postType->shouldReceive('postTypeName')
-            ->once()
-            ->withNoArgs()
-            ->andReturn('lyric-post-type');
-
-
-        $metaBoxBuilder = new MetaBoxBuilder();
-        $metaBoxBuilder->setPostType($postType);
-
-
-        $this->assertAttributeEquals('lyric-post-type', 'postType', $metaBoxBuilder);
-    }
-
     public function test_set_meta_box_fields()
     {
         $metaBoxBuilder = new MetaBoxBuilder();
@@ -144,10 +118,10 @@ class MetaBoxBuilderTest extends TestCase
         $metaBoxBuilder = new MetaBoxBuilder();
 
         $metaBoxBuilder->title('Lyric MetaBox')
-            ->setPostType('lyric-post-type')
             ->priority('default')
             ->context('normal')
             ->fields(['field-text']);
+        $metaBoxBuilder->setPostType('lyric-post-type');
 
         $return = $metaBoxBuilder->build();
 

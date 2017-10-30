@@ -6,12 +6,7 @@ use Lyric\Support\Strings;
 
 class Column
 {
-    /**
-     * Post types where columns are displayed
-     *
-     * @var array
-     */
-    protected $postType;
+    use HasParentPostType;
 
     /**
      * Column title
@@ -78,7 +73,7 @@ class Column
      */
     public function __construct($postType, $id, $title = null)
     {
-        $this->postType = $postType;
+        $this->setPostType($postType);
 
         if (is_null($title)) {
             $title = $id;

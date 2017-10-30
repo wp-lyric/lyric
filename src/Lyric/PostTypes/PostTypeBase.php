@@ -81,7 +81,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
         }
 
         // Resolve columns
-        $columnFactory = $this->container->get(ColumnsFactory::class, [$this->postTypeName()]);
+        $columnFactory = $this->container->get(ColumnsFactory::class, [$this]);
         $this->resolved[ColumnsFactory::class] = $this->columns($columnFactory);
     }
 
@@ -114,7 +114,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
             [
                 \Lyric\Contracts\MetaBox\MetaBoxBuilder::class,
                 \Lyric\Contracts\Fields\FieldFactory::class,
-                $this->postTypeName()
+                $this
             ]
         );
 
@@ -136,7 +136,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
             [
                 \Lyric\Contracts\Taxonomies\TaxonomyRegister::class,
                 \Lyric\Contracts\Fields\FieldFactory::class,
-                $this->postTypeName()
+                $this
             ]
         );
 
@@ -152,7 +152,7 @@ abstract class PostTypeBase implements PostTypeBaseContract
      *
      * @return string
      */
-    public function postTypeName()
+    public function getPostTypeName()
     {
         return $this->resolved[PostTypeRegister::class]->getName();
     }

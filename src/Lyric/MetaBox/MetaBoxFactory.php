@@ -17,7 +17,7 @@ class MetaBoxFactory
      */
     public function __construct(MetaBoxBuilder $metaBoxBuilder, FieldFactory $fieldFactory, $postType)
     {
-        $metaBoxBuilder = $metaBoxBuilder->setPostType($postType);
+        $metaBoxBuilder->setPostType($postType);
         $this->metaBoxBuilder = $metaBoxBuilder;
         $this->fieldFactory = $fieldFactory;
     }

@@ -3,17 +3,12 @@
 namespace Lyric\MetaBox;
 
 use Lyric\Contracts\MetaBox\MetaBoxBuilder as MetaBoxBuilderContract;
-use Lyric\Contracts\PostTypes\PostTypeBase;
 use Carbon_Fields\Container\Container;
+use Lyric\PostTypes\HasParentPostType;
 
 class MetaBoxBuilder implements MetaBoxBuilderContract
 {
-    /**
-     * Post type name
-     *
-     * @var string|PostTypeBase
-     */
-    protected $postType;
+    use HasParentPostType;
 
     /**
      * MetaBox title
@@ -87,20 +82,6 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
     }
 
     /**
-     * Show the container only on posts from the specified type(s).
-     *
-     * @param string|PostTypeBase $postType
-     *
-     * @return $this
-     */
-    public function setPostType($postType)
-    {
-        $this->postType = ($postType instanceof PostTypeBase) ? $postType->postTypeName() : $postType;
-
-        return $this;
-    }
-
-    /**
      * Array of the fields using Carbon_Fields\Field\Field
      *
      * @param array $fields
@@ -111,7 +92,6 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
 
         return $this;
     }
-
 
     /**
      * Build Options Page using Carbon_Fields
@@ -142,7 +122,6 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
 
         return $postMetaContainer;
     }
-
 
     /**
      * Get Carbon Field Container

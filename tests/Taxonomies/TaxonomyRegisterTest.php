@@ -87,21 +87,6 @@ class TaxonomyRegisterTest extends TestCase
         $taxonomy = new TaxonomyRegister(['singular' => 'Tag'], 'lyric-post');
     }
 
-    public function test_should_register_taxonomy_using_post_type_object()
-    {
-        $register = Mockery::mock(\Lyric\Contracts\PostTypes\PostTypeRegister::class);
-
-        $register->shouldReceive('getName')
-            ->once()
-            ->withNoArgs()
-            ->andReturn('lyric-post-type');
-
-
-        $taxonomy = new TaxonomyRegister('Tag', $register);
-
-        $this->assertAttributeEquals('lyric-post-type', 'postType', $taxonomy);
-    }
-
     public function test_add_labels_and_return_merged_with_default_labels()
     {
         // Mock functions
