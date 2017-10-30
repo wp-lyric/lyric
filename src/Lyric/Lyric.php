@@ -35,6 +35,20 @@ class Lyric
     protected $optionsPageList = [];
 
     /**
+     * List of the taxonomies
+     *
+     * @var array
+     */
+    protected $taxonomiesList = [];
+
+    /**
+     * List of the meta boxes
+     *
+     * @var array
+     */
+    protected $metaBoxesList = [];
+
+    /**
      * Lyric constructor.
      *
      * @param Container $container
@@ -146,6 +160,52 @@ class Lyric
     }
 
     /**
+     * Add TaxonomyBase to bind
+     *
+     * @param $taxonomyBaseClass
+     * @param $postType
+     *
+     * @return $this
+     */
+    public function addTaxonomy($taxonomyBaseClass, $postType)
+    {
+        $registerTaxonomy = $this->container()->get(\Lyric\Contracts\Taxonomies\TaxonomyRegister::class);
+
+        $registerTaxonomy->setPostType($postType);
+
+        $this->container()->share($taxonomyBaseClass)
+            ->withArgument($registerTaxonomy)
+            ->withArgument(\Lyric\Contracts\Fields\FieldFactory::class);
+
+        $this->taxonomiesList[] = $taxonomyBaseClass;
+
+        return $this;
+    }
+
+    /**
+     * Add MetaBoxBase to bind
+     *
+     * @param $metaBoxClass
+     * @param $postType
+     *
+     * @return $this
+     */
+    public function addMetaBox($metaBoxClass, $postType)
+    {
+        $metaBoxBuilder = $this->container()->get(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class);
+
+        $metaBoxBuilder->setPostType($postType);
+
+        $this->container()->share($metaBoxClass)
+            ->withArgument($metaBoxBuilder)
+            ->withArgument(\Lyric\Contracts\Fields\FieldFactory::class);
+
+        $this->metaBoxesList[] = $metaBoxClass;
+
+        return $this;
+    }
+
+    /**
      * Register options page in Lyric
      *
      * @param $optionsPageClass
@@ -176,13 +236,19 @@ class Lyric
     }
 
     /**
-     * Bind options pages to WordPress
+     * Bind Other objects
+     *
+     * - Options Page
+     * - Taxonomies
+     * - Meta boxes
      */
-    protected function bindOptionsPage()
+    protected function bindOthersInstances()
     {
-        foreach ($this->optionsPageList as $optionsPage) {
-            if ($this->container()->has($optionsPage)) {
-                ($this->container()->get($optionsPage))->bind();
+        $objectsToBind = array_merge( $this->optionsPageList, $this->metaBoxesList, $this->taxonomiesList);
+
+        foreach ($objectsToBind as $item) {
+            if ($this->container()->has($item)) {
+                ($this->container()->get($item))->bind();
             }
         }
     }
@@ -190,13 +256,16 @@ class Lyric
     /**
      * Init Lyric
      * - Register post types
+     * - Register taxonomies
+     * - Register options page
+     * - Register meta boxes
      * - Init Carbon Fields
      */
     public function boot()
     {
         $this->bindPostTypes();
 
-        $this->bindOptionsPage();
+        $this->bindOthersInstances();
 
         add_action('after_setup_theme', function () {
             \Carbon_Fields\Carbon_Fields::boot();

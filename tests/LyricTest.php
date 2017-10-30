@@ -139,6 +139,89 @@ class LyricTest extends TestCase
         $this->assertFalse($lyric->postType('FakePostType'));
     }
 
+    public function test_save_taxonomies_to_bind_in_lyric_boot()
+    {
+        $container = $this->get_mock_container();
+
+        $taxonomyRegister = Mockery::mock(\Lyric\Contracts\Taxonomies\TaxonomyRegister::class);
+
+        // Configure mocks
+        $container->shouldReceive('get')
+            ->once()
+            ->with(\Lyric\Contracts\Taxonomies\TaxonomyRegister::class)
+            ->andReturn($taxonomyRegister);
+
+        $container->shouldReceive('share')
+            ->once()
+            ->with(\Lyric\Taxonomies\TaxonomyBase::class)
+            ->andReturnSelf();
+
+        $container->shouldReceive('withArgument')
+            ->once()
+            ->with($taxonomyRegister)
+            ->andReturnSelf();
+
+        $container->shouldReceive('withArgument')
+            ->once()
+            ->with(\Lyric\Contracts\Fields\FieldFactory::class)
+            ->andReturnSelf();
+
+        $taxonomyRegister->shouldReceive('setPostType')
+            ->once()
+            ->with('lyric-post-type')
+            ->andReturnSelf();
+
+        // Execute
+        $lyric = new Lyric($container);
+        $lyric->addTaxonomy(\Lyric\Taxonomies\TaxonomyBase::class, 'lyric-post-type');
+
+        // Assertions
+        $this->assertAttributeContains(\Lyric\Taxonomies\TaxonomyBase::class, 'taxonomiesList', $lyric);
+    }
+
+    public function test_add_meta_box_and_save_to_bind_in_boot()
+    {
+        $container = $this->get_mock_container();
+
+        $metaBoxBuilder = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class);
+
+        // Configure mocks
+        $container->shouldReceive('get')
+            ->once()
+            ->with(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class)
+            ->andReturn($metaBoxBuilder);
+
+        $container->shouldReceive('share')
+            ->once()
+            ->with(\Lyric\Contracts\MetaBox\MetaBoxBase::class)
+            ->andReturnSelf();
+
+        $container->shouldReceive('withArgument')
+            ->once()
+            ->with($metaBoxBuilder)
+            ->andReturnSelf();
+
+        $container->shouldReceive('withArgument')
+            ->once()
+            ->with(\Lyric\Contracts\Fields\FieldFactory::class)
+            ->andReturnSelf();
+
+        $metaBoxBuilder->shouldReceive('setPostType')
+            ->once()
+            ->with('lyric-post-type')
+            ->andReturnSelf();
+        // Execute
+        $lyric = new Lyric($container);
+        $lyric->addMetaBox(\Lyric\Contracts\MetaBox\MetaBoxBase::class, 'lyric-post-type');
+
+        // Assertions
+        $this->assertAttributeContains(
+            \Lyric\Contracts\MetaBox\MetaBoxBase::class,
+            'metaBoxesList',
+            $lyric
+        );
+    }
+
     public function test_should_register_options_page()
     {
         $container = $this->get_mock_container();
@@ -172,9 +255,13 @@ class LyricTest extends TestCase
         $container = $this->get_mock_container();
         // Use contact to create full mock
         $postType = Mockery::mock(\Lyric\Contracts\PostTypes\PostTypeBase::class);
+        $taxonomy = Mockery::mock('TaxonomyBase'); // Used fake name to prevent mockery from call original class
+        $metaBox = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxBase::class);
         $optionsPage = Mockery::mock(\Lyric\Contracts\OptionsPages\PageBase::class);
 
         // Configure mocks
+
+        // Bind post type
         $container->shouldReceive('has')
             ->once()
             ->with(\Lyric\Contracts\PostTypes\PostTypeBase::class)
@@ -189,6 +276,37 @@ class LyricTest extends TestCase
             ->once()
             ->withNoArgs();
 
+        // Bind Taxonomies
+        $container->shouldReceive('has')
+            ->once()
+            ->with(\Lyric\Taxonomies\TaxonomyBase::class)
+            ->andReturn(true);
+
+        $container->shouldReceive('get')
+            ->once()
+            ->with(\Lyric\Taxonomies\TaxonomyBase::class)
+            ->andReturn($taxonomy);
+
+        $taxonomy->shouldReceive('bind')
+            ->once()
+            ->withNoArgs();
+
+        // Bind Meta Boxes
+        $container->shouldReceive('has')
+            ->once()
+            ->with(\Lyric\Contracts\MetaBox\MetaBoxBase::class)
+            ->andReturn(true);
+
+        $container->shouldReceive('get')
+            ->once()
+            ->with(\Lyric\Contracts\MetaBox\MetaBoxBase::class)
+            ->andReturn($metaBox);
+
+        $metaBox->shouldReceive('bind')
+            ->once()
+            ->withNoArgs();
+
+        // Bind Options Page
         $container->shouldReceive('has')
             ->once()
             ->with(\Lyric\Contracts\OptionsPages\PageBase::class)
@@ -212,15 +330,31 @@ class LyricTest extends TestCase
 
         $reflectLyric = new \ReflectionClass(Lyric::class);
 
+        // Add post type in property list
         $postTypeListProperty = $reflectLyric->getProperty('postTypeList');
         $postTypeListProperty->setAccessible(true);
         $postTypeListProperty->setValue($lyric, [
             'lyric-post-type' => \Lyric\Contracts\PostTypes\PostTypeBase::class
         ]);
 
-        $postTypeListProperty = $reflectLyric->getProperty('optionsPageList');
-        $postTypeListProperty->setAccessible(true);
-        $postTypeListProperty->setValue($lyric, [
+        // Add meta box list
+        $taxonomiesListProperty = $reflectLyric->getProperty('taxonomiesList');
+        $taxonomiesListProperty->setAccessible(true);
+        $taxonomiesListProperty->setValue($lyric, [
+            \Lyric\Taxonomies\TaxonomyBase::class
+        ]);
+
+        // Add meta box list
+        $metaBoxListProperty = $reflectLyric->getProperty('metaBoxesList');
+        $metaBoxListProperty->setAccessible(true);
+        $metaBoxListProperty->setValue($lyric, [
+            \Lyric\Contracts\MetaBox\MetaBoxBase::class
+        ]);
+
+        // Add options page in list
+        $optionsPageListProperty = $reflectLyric->getProperty('optionsPageList');
+        $optionsPageListProperty->setAccessible(true);
+        $optionsPageListProperty->setValue($lyric, [
             \Lyric\Contracts\OptionsPages\PageBase::class
         ]);
 

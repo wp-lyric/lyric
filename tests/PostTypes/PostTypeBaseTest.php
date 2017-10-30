@@ -81,7 +81,6 @@ class PostTypeBaseTest extends TestCase
             ->with('MetaBoxBaseExtended')
             ->andReturnSelf();
 
-
         $postTypeBase->shouldReceive('postTypeName')
             ->once()
             ->withNoArgs()
