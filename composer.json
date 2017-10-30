@@ -12,7 +12,10 @@
     "autoload": {
         "psr-4": {
             "Lyric\\": "src/Lyric/"
-        }
+        },
+        "files": [
+            "src/Lyric/helpers.php"
+        ]
     },
     "require": {
         "htmlburger/carbon-fields": "^2.1",
