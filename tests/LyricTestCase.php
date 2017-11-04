@@ -57,5 +57,6 @@ abstract class LyricTestCase extends TestCase
         $property = $reflection->getProperty($propertyName);
         $property->setAccessible(true);
         $property->setValue($object, $value);
+        $property->setAccessible(false);
     }
 }

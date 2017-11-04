@@ -3,11 +3,10 @@
 namespace LyricTests\Metabox;
 
 use Lyric\MetaBox\MetaBoxBuilder;
-use Lyric\Contracts\PostTypes\PostTypeBase;
-use PHPUnit\Framework\TestCase;
+use LyricTests\LyricTestCase;
 use Mockery;
 
-class MetaBoxBuilderTest extends TestCase
+class MetaBoxBuilderTest extends LyricTestCase
 {
 
     protected function tearDown()
@@ -16,7 +15,10 @@ class MetaBoxBuilderTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_set_meta_box_title()
+    /**
+     * Set meta box title
+     */
+    public function testSetMetaBoxTitle()
     {
         $metaBoxBuilder = new MetaBoxBuilder();
 
@@ -25,7 +27,10 @@ class MetaBoxBuilderTest extends TestCase
         $this->assertAttributeEquals('MetBox Title', 'title', $metaBoxBuilder);
     }
 
-    public function test_set_meta_box_priority()
+    /**
+     * Set meta box priority
+     */
+    public function testSetMetaBoxPriority()
     {
         $metaBoxBuilder = new MetaBoxBuilder();
 
@@ -34,7 +39,10 @@ class MetaBoxBuilderTest extends TestCase
         $this->assertAttributeEquals('high', 'priority', $metaBoxBuilder);
     }
 
-    public function test_set_meta_box_context()
+    /**
+     * Set meta box context
+     */
+    public function testSetMetaBoxContext()
     {
         $metaBoxBuilder = new MetaBoxBuilder();
 
@@ -43,7 +51,10 @@ class MetaBoxBuilderTest extends TestCase
         $this->assertAttributeEquals('advanced', 'context', $metaBoxBuilder);
     }
 
-    public function test_set_meta_box_fields()
+    /**
+     * Set meta box fields
+     */
+    public function testSetMetaBoxFields()
     {
         $metaBoxBuilder = new MetaBoxBuilder();
 
@@ -53,19 +64,22 @@ class MetaBoxBuilderTest extends TestCase
     }
 
     /**
+     * Throw excerption if page does not have title
+     *
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Configure Meta Box title
      */
-    public function test_throw_excerption_if_page_does_not_have_title()
+    public function testThrowExcerptionIfPageDoesNotHaveTitle()
     {
-        $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
-
         $metaBoxBuilder = new MetaBoxBuilder();
 
         $metaBoxBuilder->build();
     }
 
-    public function test_build_meta_box_using_minimal_configuration()
+    /**
+     * Build meta box using minimal configuration
+     */
+    public function testBuildMetaBoxUsingMinimalConfiguration()
     {
         $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
 
@@ -86,7 +100,10 @@ class MetaBoxBuilderTest extends TestCase
         $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $metaBoxBuilder->build());
     }
 
-    public function test_build_meta_box_using_full_options()
+    /**
+     * Build meta box using full options
+     */
+    public function testBuildMetaBoxUsingFullOptions()
     {
         $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
 
@@ -126,5 +143,84 @@ class MetaBoxBuilderTest extends TestCase
         $return = $metaBoxBuilder->build();
 
         $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $return);
+    }
+
+    /**
+     * Build meta box using tabs to fields
+     */
+    public function testBuildMetaBoxUsingTabsToFields()
+    {
+        $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
+
+        $carbonContainer->shouldReceive('factory')
+            ->once()
+            ->with('post_meta', 'Lyric MetaBox')
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Tab 1', ['input', 'textearea'])
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Tab 2', ['gallery'])
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Tab 3', ['select', 'radio'])
+            ->andReturnSelf();
+
+        $metaBoxBuilder = new MetaBoxBuilder();
+
+        $metaBoxBuilder->title('Lyric MetaBox');
+
+        $metaBoxBuilder->fields([
+            'Tab 1' => ['input', 'textearea'],
+            'Tab 2' => ['gallery'],
+            'Tab 3' => ['select', 'radio']
+        ]);
+
+        $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $metaBoxBuilder->build());
+    }
+
+    /**
+     * Force tabs using method has tabs
+     */
+    public function testForceTabsUsingMethodHasTabs()
+    {
+        // Arrange
+        $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
+
+        $carbonContainer->shouldReceive('factory')
+            ->once()
+            ->with('post_meta', 'Lyric MetaBox')
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Tab 1', ['input', 'textearea'])
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Tab 2', ['gallery'])
+            ->andReturnSelf();
+
+        // Act
+        $metaBoxBuilder = new MetaBoxBuilder();
+
+        $metaBoxBuilder->title('Lyric MetaBox');
+
+        $metaBoxBuilder->withTabs(true);
+
+        $metaBoxBuilder->fields([
+           ['input', 'textearea'],
+           ['gallery'],
+        ]);
+
+        // Assert
+        $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $metaBoxBuilder->build());
     }
 }

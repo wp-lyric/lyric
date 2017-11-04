@@ -32,12 +32,26 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
     protected $context;
 
     /**
+     * Meta box has tabs
+     *
+     * @var bool
+     */
+    protected $withTabs = false;
+
+    /**
+     * Prefix used to build tab name
+     *
+     * @var string
+     */
+    protected $tabNamePrefix;
+
+    /**
      * Carbon Fields instance
      * Used to builder the metaBox fields
      *
      * @var array
      */
-    protected $fields;
+    protected $fields = [];
 
     /**
      * Set MetaBox title
@@ -82,9 +96,26 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
     }
 
     /**
+     * Force tabs in meta-box
+     *
+     * @param $hasTabs
+     *
+     * @return $this
+     */
+    public function withTabs($hasTabs, $prefix = 'Tab')
+    {
+        $this->withTabs = $hasTabs;
+        $this->tabNamePrefix = $prefix;
+
+        return $this;
+    }
+
+    /**
      * Array of the fields using Carbon_Fields\Field\Field
      *
      * @param array $fields
+     *
+     * @return $this
      */
     public function fields(array $fields)
     {
@@ -100,7 +131,7 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
      */
     public function build()
     {
-        if(is_null($this->title) || empty($this->title)) {
+        if (is_null($this->title) || empty($this->title)) {
             throw new \InvalidArgumentException('Configure Meta Box title');
         }
 
@@ -110,17 +141,47 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
             $postMetaContainer->show_on_post_type($this->postType);
         }
 
-        if(!is_null($this->priority)) {
+        if (!is_null($this->priority)) {
             $postMetaContainer->set_priority($this->priority);
         }
 
-        if(!is_null($this->context)) {
+        if (!is_null($this->context)) {
             $postMetaContainer->set_context($this->context);
         }
 
-        $postMetaContainer->add_fields($this->fields);
+        // Configure fields
+        if ($this->withTabs) {
+            $count = 0;
+            foreach ($this->fields as $field) {
+                $tabName = sprintf('%1$s %2$s', $this->tabNamePrefix, ++$count);
+                $postMetaContainer->add_tab($tabName, $field);
+            }
+
+        } elseif ($this->fieldsHasTabs()) {
+            foreach ($this->fields as $tab => $field) {
+                $postMetaContainer->add_tab($tab, $field);
+            }
+
+        } else {
+            $postMetaContainer->add_fields($this->fields);
+        }
+
 
         return $postMetaContainer;
+    }
+
+    /**
+     * Test if array is associative
+     *
+     * @return bool
+     */
+    private function fieldsHasTabs()
+    {
+        if ([] === $this->fields) {
+            return false;
+        };
+
+        return array_keys($this->fields) !== range(0, count($this->fields) - 1);
     }
 
     /**

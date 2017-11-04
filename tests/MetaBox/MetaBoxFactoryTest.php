@@ -2,28 +2,27 @@
 
 namespace LyricTests\MetaBox;
 
-use Lyric\MetaBox\MetaBoxFactory;
-use PHPUnit\Framework\TestCase;
-use Mockery;
-use Brain\Monkey;
 
-class MetaBoxFactoryTest extends TestCase
+use Lyric\MetaBox\MetaBoxFactory;
+use LyricTests\LyricTestCase;
+use LyricTests\MetaBox\Fixtures\MetaBoxBaseFake;
+use Mockery;
+
+class MetaBoxFactoryTest extends LyricTestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
 
     protected function tearDown()
     {
-        Monkey\tearDown();
         Mockery::close();
         parent::tearDown();
     }
 
-    public function test_should_prepare_dependencies_to_meta_boxes_base_classes()
+    /**
+     * Should prepare dependencies to meta boxes base classes
+     */
+    public function testShouldPrepareDependenciesToMetaBoxesBaseClasses()
     {
+        // Arrange
         $metaBoxBuilder = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class);
         $fieldsFactory = Mockery::mock(\Lyric\Contracts\Fields\FieldFactory::class);
 
@@ -32,18 +31,14 @@ class MetaBoxFactoryTest extends TestCase
             ->with('lyric-post-type')
             ->andReturnSelf();
 
+        // Act
         $metaBoxFactory = new MetaBoxFactory($metaBoxBuilder, $fieldsFactory, 'lyric-post-type');
+        $metaBoxFactory->addMetaBox(MetaBoxBaseFake::class);
+        $metaBoxFactory->bind();
 
-        $this->assertAttributeInstanceOf(
-            \Lyric\Contracts\MetaBox\MetaBoxBuilder::class,
-            'metaBoxBuilder',
-            $metaBoxFactory
-        );
-
-        $this->assertAttributeInstanceOf(
-            \Lyric\Contracts\Fields\FieldFactory::class,
-            'fieldFactory',
-            $metaBoxFactory
+        // Assert
+        $this->assertTrue(
+            has_action('carbon_fields_register_fields', 'function ()') // Action called in MetaBoxBaseFake::class
         );
     }
 }

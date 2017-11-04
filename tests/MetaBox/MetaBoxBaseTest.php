@@ -2,31 +2,26 @@
 
 namespace LyricTests\MetaBox;
 
+use LyricTests\LyricTestCase;
 use Mockery;
-use Brain\Monkey;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\MetaBox\MetaBoxBuilder;
 use Brain\Monkey\Functions;
 use Lyric\MetaBox\MetaBoxBase;
-use PHPUnit\Framework\TestCase;
 
-class MetaBoxBaseTest extends TestCase
+class MetaBoxBaseTest extends LyricTestCase
 {
-
-    protected function setUp()
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
 
     protected function tearDown()
     {
-        Monkey\tearDown();
         Mockery::close();
         parent::tearDown();
     }
 
-    public function test_set_post_type_name_using_post_type_instance()
+    /**
+     * Set post type name using post type instance
+     */
+    public function testSetPostTypeNameUsingPostTypeInstance()
     {
         $fields = Mockery::mock(FieldFactory::class);
 
@@ -46,7 +41,10 @@ class MetaBoxBaseTest extends TestCase
         $this->assertInstanceOf(\Lyric\Contracts\MetaBox\MetaBoxBase::class, $metaBox->setPostType($postType));
     }
 
-    public function test_should_register_extended_meta_box_class()
+    /**
+     * Should register extended meta box class
+     */
+    public function testShouldRegisterExtendedMetaBoxClass()
     {
         $fields = Mockery::mock(FieldFactory::class);
 
