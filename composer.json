@@ -17,6 +17,11 @@
             "src/Lyric/helpers.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "LyricTests\\": "tests/"
+        }
+    },
     "require": {
         "htmlburger/carbon-fields": "^2.1",
         "league/container": "^2.4"

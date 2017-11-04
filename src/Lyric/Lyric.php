@@ -224,18 +224,6 @@ class Lyric
     }
 
     /**
-     * Bind post types to WordPress
-     */
-    protected function bindPostTypes()
-    {
-        foreach ($this->postTypeList as $key => $postType) {
-            if ($this->container()->has($postType)) {
-                ($this->container()->get($postType))->bind();
-            }
-        }
-    }
-
-    /**
      * Bind Other objects
      *
      * - Options Page
@@ -244,7 +232,7 @@ class Lyric
      */
     protected function bindOthersInstances()
     {
-        $objectsToBind = array_merge( $this->optionsPageList, $this->metaBoxesList, $this->taxonomiesList);
+        $objectsToBind = array_merge( $this->postTypeList, $this->optionsPageList, $this->metaBoxesList, $this->taxonomiesList);
 
         foreach ($objectsToBind as $item) {
             if ($this->container()->has($item)) {
@@ -263,8 +251,6 @@ class Lyric
      */
     public function boot()
     {
-        $this->bindPostTypes();
-
         $this->bindOthersInstances();
 
         add_action('after_setup_theme', function () {
