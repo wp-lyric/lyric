@@ -12,7 +12,9 @@ use Lyric\Support\Strings;
 abstract class PostTypeBase implements PostTypeBaseContract
 {
     /**
-     * Name used to identify Post Type
+     * Assign the post type names.
+     * Accepts post type string or array
+     * Options to array: name, slug, plural, singular.
      *
      * @var string|array
      */
