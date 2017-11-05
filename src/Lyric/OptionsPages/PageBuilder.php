@@ -51,6 +51,20 @@ class PageBuilder implements PageBuilderContract
     protected $parent;
 
     /**
+     * Meta box has tabs
+     *
+     * @var bool
+     */
+    protected $withTabs = false;
+
+    /**
+     * Prefix used to build tab name
+     *
+     * @var string
+     */
+    protected $tabNamePrefix;
+
+    /**
      * Fields list
      *
      * @var array
@@ -146,15 +160,38 @@ class PageBuilder implements PageBuilderContract
     }
 
     /**
-     * Set parent page slug
+     * Force tabs in meta-box
      *
-     * @param $parent
+     * @param $hasTabs
      *
      * @return $this
      */
-    public function parent($parent)
+    public function withTabs($prefix = 'Tab')
     {
-        $this->parent = ($parent instanceof PageBuilderContract) ? $parent->getSlug() : $parent;
+        $this->withTabs = true;
+        $this->tabNamePrefix = $prefix;
+
+        return $this;
+    }
+
+    /**
+     * Set parent page slug
+     *
+     * @param $pageParent
+     *
+     * @return $this
+     */
+    public function parent($pageParent)
+    {
+        if($pageParent instanceof \Lyric\Contracts\OptionsPages\PageBuilder) {
+            $pageParent = $pageParent->getSlug();
+        }
+
+        if($pageParent instanceof  \Lyric\OptionsPages\PageBase) {
+            $pageParent = $pageParent->getSlug();
+        }
+
+        $this->parent = $pageParent;
 
         return $this;
     }
@@ -204,11 +241,38 @@ class PageBuilder implements PageBuilderContract
             $themeOptionsContainer->set_icon($this->icon);
         }
 
-        if(is_array($this->fields)) {
+        // Configure fields
+        if ($this->withTabs) {
+            $count = 0;
+            foreach ($this->fields as $field) {
+                $tabName = sprintf('%1$s %2$s', $this->tabNamePrefix, ++$count);
+                $themeOptionsContainer->add_tab($tabName, $field);
+            }
+
+        } elseif ($this->fieldsHasTabs()) {
+            foreach ($this->fields as $tab => $field) {
+                $themeOptionsContainer->add_tab($tab, $field);
+            }
+
+        } else {
             $themeOptionsContainer->add_fields($this->fields);
         }
 
         return $themeOptionsContainer;
+    }
+
+    /**
+     * Test if array is associative
+     *
+     * @return bool
+     */
+    private function fieldsHasTabs()
+    {
+        if ([] === $this->fields) {
+            return false;
+        };
+
+        return array_keys($this->fields) !== range(0, count($this->fields) - 1);
     }
 
     /**

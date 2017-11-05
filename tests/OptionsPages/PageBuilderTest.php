@@ -4,10 +4,11 @@ namespace LyricTests\OptionsPages;
 
 use Lyric\Contracts\OptionsPages\PageBuilder as PageBuilderContract;
 use Lyric\OptionsPages\PageBuilder;
-use PHPUnit\Framework\TestCase;
+use LyricTests\LyricTestCase;
+use LyricTests\OptionsPages\Fixtures\OptionsPageFaker;
 use Mockery;
 
-class PageBuilderTest extends TestCase
+class PageBuilderTest extends LyricTestCase
 {
 
     protected function tearDown()
@@ -16,7 +17,10 @@ class PageBuilderTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_set_menu_title()
+    /**
+     *Set menu title
+     */
+    public function testSetMenuTitle()
     {
         $adminPageBuilder = new PageBuilder();
 
@@ -26,7 +30,10 @@ class PageBuilderTest extends TestCase
         $this->assertAttributeEquals('lyric-admin-page', 'slug', $adminPageBuilder);
     }
 
-    public function test_set_page_title()
+    /**
+     * Set page title
+     */
+    public function testSetPageTitle()
     {
         $adminPageBuilder = new PageBuilder();
 
@@ -35,7 +42,10 @@ class PageBuilderTest extends TestCase
         $this->assertAttributeEquals('Lyric Admin Page', 'pageTitle', $adminPageBuilder);
     }
 
-    public function test_set_page_slug()
+    /**
+     * Set page slug
+     */
+    public function testSetPageSlug()
     {
         $adminPageBuilder = new PageBuilder();
 
@@ -45,8 +55,10 @@ class PageBuilderTest extends TestCase
         $this->assertEquals('lyric-slug', $adminPageBuilder->getSlug());
     }
 
-
-    public function test_set_menu_icon()
+    /**
+     * Set menu icon
+     */
+    public function testSetMenuIcon()
     {
         $adminPageBuilder = new PageBuilder();
 
@@ -55,7 +67,10 @@ class PageBuilderTest extends TestCase
         $this->assertAttributeEquals('lyric-icon', 'icon', $adminPageBuilder);
     }
 
-    public function test_set_menu_position()
+    /**
+     * Set menu position
+     */
+    public function testSetMenuPosition()
     {
         $adminPageBuilder = new PageBuilder();
 
@@ -66,18 +81,22 @@ class PageBuilderTest extends TestCase
     }
 
     /**
+     * Throw exception to use invalid position
+     *
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Use numeric position to register option page
      */
-    public function test_throw_excerption_to_use_invalid_position()
+    public function testThrowExceptionToUseInvalidPosition()
     {
         $adminPageBuilder = new PageBuilder();
 
         $adminPageBuilder->position("five");
     }
 
-
-    public function test_add_fields()
+    /**
+     * Add fields
+     */
+    public function testAddFields()
     {
         $adminPageBuilder = new PageBuilder();
 
@@ -86,7 +105,10 @@ class PageBuilderTest extends TestCase
         $this->assertAttributeEquals(['field-text'], 'fields', $adminPageBuilder);
     }
 
-    public function test_set_parent_page_using_string()
+    /**
+     * Set parent page using string
+     */
+    public function testSetParentPageUsingString()
     {
         $adminPageBuilder = new PageBuilder();
 
@@ -95,12 +117,17 @@ class PageBuilderTest extends TestCase
         $this->assertAttributeEquals('lyric-options-page', 'parent', $adminPageBuilder);
     }
 
-    public function test_set_parent_page_using_object()
+    /**
+     * Set parent page using object
+     */
+    public function testSetParentPageUsingObject()
     {
         $parentPageBuilder = Mockery::mock(PageBuilderContract::class);
+        $factoryFields = Mockery::mock(\Lyric\Contracts\Fields\FieldFactory::class);
+        $parentPageBase = new OptionsPageFaker($parentPageBuilder, $factoryFields);
 
         $parentPageBuilder->shouldReceive('getSlug')
-            ->once()
+            ->twice()
             ->withNoArgs()
             ->andReturn('lyric-options-page');
 
@@ -108,11 +135,31 @@ class PageBuilderTest extends TestCase
         $adminPageBuilder = new PageBuilder();
         $adminPageBuilder->parent($parentPageBuilder);
 
+        $otherPageBuilder = new PageBuilder();
+        $otherPageBuilder->parent($parentPageBase);
+
 
         $this->assertAttributeEquals('lyric-options-page', 'parent', $adminPageBuilder);
+        $this->assertAttributeEquals('lyric-options-page', 'parent', $otherPageBuilder);
     }
 
-    public function test_build_option_page_using_minimal_configuration()
+    /**
+     * Throw exception if page does not have title
+     *
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Configure page title
+     */
+    public function testThrowExceptionIfPageDoesNotHaveTitle()
+    {
+        $adminPageBuilder = new PageBuilder();
+
+        $adminPageBuilder->build();
+    }
+
+    /**
+     * Build option page using minimal configuration
+     */
+    public function testBuildOptionPageUsingMinimalConfiguration()
     {
         $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
 
@@ -138,7 +185,10 @@ class PageBuilderTest extends TestCase
         $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $adminPageBuilder->build());
     }
 
-    public function test_build_option_page_using_full_options()
+    /**
+     * Build option page using full options
+     */
+    public function testBuildOptionPageUsingFullOptions()
     {
         $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
 
@@ -150,6 +200,11 @@ class PageBuilderTest extends TestCase
         $carbonContainer->shouldReceive('set_page_file')
             ->once()
             ->with('lyric-options')
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('set_page_parent')
+            ->once()
+            ->with('lyric-options-parent')
             ->andReturnSelf();
 
         $carbonContainer->shouldReceive('set_page_menu_title')
@@ -176,6 +231,7 @@ class PageBuilderTest extends TestCase
 
         $adminPageBuilder->title('Lyric Options')
             ->pageTitle('Lyric Options Page')
+            ->parent('lyric-options-parent')
             ->icon('lyric-icon')
             ->position('42')
             ->fields(['field-text']);
@@ -185,50 +241,90 @@ class PageBuilderTest extends TestCase
         $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $return);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Configure page title
-     */
-    public function test_throw_excerption_if_page_does_not_have_title()
+    public function testAddTabsInOptionsPage()
     {
-        $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
-
-        $adminPageBuilder = new PageBuilder();
-
-        $adminPageBuilder->build();
-    }
-
-
-    public function test_build_child_option_page_using_minimal_configuration()
-    {
+        // Arrange
         $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
 
         $carbonContainer->shouldReceive('factory')
             ->once()
-            ->with('theme_options', 'Lyric Child Options Page')
+            ->with('theme_options', 'Lyric Options Page')
             ->andReturnSelf();
-
-        $carbonContainer->shouldReceive('set_page_parent')
-            ->once()
-            ->with('lyric-options')
-            ->andReturnSelf();
-
 
         $carbonContainer->shouldReceive('set_page_file')
             ->once()
-            ->with('lyric-child-options-page')
+            ->with('lyric-options-page')
             ->andReturnSelf();
 
-        $carbonContainer->shouldReceive('add_fields')
+        $carbonContainer->shouldReceive('add_tab')
             ->once()
-            ->with([])
+            ->with('Custom Tab 1', ['input', 'textearea'])
             ->andReturnSelf();
 
-        $adminChildPageBuilder = new PageBuilder();
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Custom Tab 2', ['gallery'])
+            ->andReturnSelf();
 
-        $adminChildPageBuilder->title('Lyric Child Options Page');
-        $adminChildPageBuilder->parent('lyric-options');
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Custom Tab 3', ['select', 'radio'])
+            ->andReturnSelf();
 
-        $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $adminChildPageBuilder->build());
+        // Act
+        $adminPageBuilder = new PageBuilder();
+        $adminPageBuilder->title('Lyric Options Page')
+            ->fields([
+                'Custom Tab 1' => ['input', 'textearea'],
+                'Custom Tab 2' => ['gallery'],
+                'Custom Tab 3' => ['select', 'radio']
+            ]);
+
+        // Assert
+        $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $adminPageBuilder->build());
+    }
+
+    public function testCreateTabsToOptionsPageAutomatically()
+    {
+        // Arrange
+        $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
+
+        $carbonContainer->shouldReceive('factory')
+            ->once()
+            ->with('theme_options', 'Lyric Options Page')
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('set_page_file')
+            ->once()
+            ->with('lyric-options-page')
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Tab 1', ['input', 'textearea'])
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Tab 2', ['gallery'])
+            ->andReturnSelf();
+
+        $carbonContainer->shouldReceive('add_tab')
+            ->once()
+            ->with('Tab 3', ['select', 'radio'])
+            ->andReturnSelf();
+
+        // Act
+        $adminPageBuilder = new PageBuilder();
+        $adminPageBuilder->title('Lyric Options Page')
+            ->withTabs()
+            ->fields([
+                ['input', 'textearea'],
+                ['gallery'],
+                ['select', 'radio']
+            ]);
+
+        // Assert
+        $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $adminPageBuilder->build());
     }
 }

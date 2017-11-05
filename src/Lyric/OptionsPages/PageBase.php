@@ -38,6 +38,16 @@ abstract class PageBase implements PageBaseContract
     }
 
     /**
+     * Get slug of the page options
+     *
+     * @return string
+     */
+    final public function getSlug()
+    {
+        return $this->pageBuilder->getSlug();
+    }
+
+    /**
      * Build Page
      *
      * @param PageBuilder $pageBuilder
@@ -76,7 +86,7 @@ abstract class PageBase implements PageBaseContract
         // Bind child pages
         if (is_array($this->childPages) || !empty($this->childPages)) {
 
-            $childPageBuilder->parent($this->pageBuilder);
+            $childPageBuilder->parent($this);
 
             foreach ($this->childPages as $childPage) {
                 $childPageInstance = $this->getOptionPageBaseInstance(
