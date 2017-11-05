@@ -102,9 +102,9 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
      *
      * @return $this
      */
-    public function withTabs($hasTabs, $prefix = 'Tab')
+    public function withTabs($prefix = 'Tab')
     {
-        $this->withTabs = $hasTabs;
+        $this->withTabs = true;
         $this->tabNamePrefix = $prefix;
 
         return $this;

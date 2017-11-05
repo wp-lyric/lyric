@@ -159,17 +159,17 @@ class MetaBoxBuilderTest extends LyricTestCase
 
         $carbonContainer->shouldReceive('add_tab')
             ->once()
-            ->with('Tab 1', ['input', 'textearea'])
+            ->with('Custom Tab 1', ['input', 'textearea'])
             ->andReturnSelf();
 
         $carbonContainer->shouldReceive('add_tab')
             ->once()
-            ->with('Tab 2', ['gallery'])
+            ->with('Custom Tab 2', ['gallery'])
             ->andReturnSelf();
 
         $carbonContainer->shouldReceive('add_tab')
             ->once()
-            ->with('Tab 3', ['select', 'radio'])
+            ->with('Custom Tab 3', ['select', 'radio'])
             ->andReturnSelf();
 
         $metaBoxBuilder = new MetaBoxBuilder();
@@ -177,18 +177,18 @@ class MetaBoxBuilderTest extends LyricTestCase
         $metaBoxBuilder->title('Lyric MetaBox');
 
         $metaBoxBuilder->fields([
-            'Tab 1' => ['input', 'textearea'],
-            'Tab 2' => ['gallery'],
-            'Tab 3' => ['select', 'radio']
+            'Custom Tab 1' => ['input', 'textearea'],
+            'Custom Tab 2' => ['gallery'],
+            'Custom Tab 3' => ['select', 'radio']
         ]);
 
         $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $metaBoxBuilder->build());
     }
 
     /**
-     * Force tabs using method has tabs
+     * Create tabs to meta box automatically
      */
-    public function testForceTabsUsingMethodHasTabs()
+    public function testCreateTabsToMetaBoxAutomatically()
     {
         // Arrange
         $carbonContainer = Mockery::mock('alias:Carbon_Fields\Container\Container');
@@ -213,11 +213,11 @@ class MetaBoxBuilderTest extends LyricTestCase
 
         $metaBoxBuilder->title('Lyric MetaBox');
 
-        $metaBoxBuilder->withTabs(true);
+        $metaBoxBuilder->withTabs();
 
         $metaBoxBuilder->fields([
-           ['input', 'textearea'],
-           ['gallery'],
+            ['input', 'textearea'],
+            ['gallery'],
         ]);
 
         // Assert

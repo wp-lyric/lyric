@@ -6,7 +6,7 @@ use Lyric\MetaBox\MetaBoxBase;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\MetaBox\MetaBoxBuilder;
 
-class MetaBoxBaseFake extends MetaBoxBase
+class MetaBoxFaker extends MetaBoxBase
 {
     /**
      * @param MetaBoxBuilder $metaBoxBuilder

@@ -5,7 +5,7 @@ namespace LyricTests\MetaBox;
 
 use Lyric\MetaBox\MetaBoxFactory;
 use LyricTests\LyricTestCase;
-use LyricTests\MetaBox\Fixtures\MetaBoxBaseFake;
+use LyricTests\MetaBox\Fixtures\MetaBoxFaker;
 use Mockery;
 
 class MetaBoxFactoryTest extends LyricTestCase
@@ -33,7 +33,7 @@ class MetaBoxFactoryTest extends LyricTestCase
 
         // Act
         $metaBoxFactory = new MetaBoxFactory($metaBoxBuilder, $fieldsFactory, 'lyric-post-type');
-        $metaBoxFactory->addMetaBox(MetaBoxBaseFake::class);
+        $metaBoxFactory->addMetaBox(MetaBoxFaker::class);
         $metaBoxFactory->bind();
 
         // Assert
