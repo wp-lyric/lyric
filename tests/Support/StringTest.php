@@ -7,13 +7,19 @@ use PHPUnit\Framework\TestCase;
 
 class StringTest extends TestCase
 {
-    public function test_change_pascal_case_to_human_format()
+    /**
+     * Change pascal case to human format
+     */
+    public function testChangePascalCaseToHumanFormat()
     {
         $this->assertEquals('Final Result', Strings::pascalCaseToHuman('FinalResult'));
         $this->assertEquals('Final Result', Strings::pascalCaseToHuman('Final Result'));
     }
 
-    public function test_change_string_to_slug_format()
+    /**
+     * Change string to slug format
+     */
+    public function testChangeStringToSlugFormat()
     {
         $this->assertEquals('final-result', Strings::slug('FinalResult'));
         $this->assertEquals('final-result', Strings::slug('Final Result'));
