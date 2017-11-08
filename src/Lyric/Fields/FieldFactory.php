@@ -8,11 +8,11 @@ use Carbon_Fields\Field\Field as CarbonField;
 class FieldFactory implements FieldFactoryContract
 {
     /**
-     * Get field
+     * Get CarbonField instance
      *
-     * @param $field
-     * @param $name
-     * @param $label
+     * @param  string     $field CarbonField id
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return mixed
      */
@@ -24,12 +24,12 @@ class FieldFactory implements FieldFactoryContract
     /**
      * This field allows to select and reorder multiple post type posts, taxonomy terms, users or comments
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Association_Field
      */
-    public function association($name, $label)
+    public function association($name, $label = null)
     {
         return $this->getFieldInstance('association', $name, $label);
     }
@@ -37,12 +37,12 @@ class FieldFactory implements FieldFactoryContract
     /**
      * The checkbox field create a single tick-able option with a label next to it
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Checkbox_Field
      */
-    public function checkbox($name, $label)
+    public function checkbox($name, $label = null)
     {
         return $this->getFieldInstance('checkbox', $name, $label);
     }
@@ -50,25 +50,38 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Color picker field
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Color_Field
      */
-    public function color($name, $label)
+    public function color($name, $label = null)
     {
         return $this->getFieldInstance('color', $name, $label);
     }
 
     /**
+     * Complex fields act as containers to which you can add multiple groups of fields
+     *
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
+     *
+     * @return \Carbon_Fields\Field\Complex_Field
+     */
+    public function complex($name, $label = null)
+    {
+        return $this->getFieldInstance('complex', $name, $label);
+    }
+
+    /**
      * Renders a date picker
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Date_Field
      */
-    public function date($name, $label)
+    public function date($name, $label = null)
     {
         return $this->getFieldInstance('date', $name, $label);
     }
@@ -76,12 +89,12 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Renders a date picker
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Date_Time_Field
      */
-    public function dateTime($name, $label)
+    public function dateTime($name, $label = null)
     {
         return $this->getFieldInstance('date_time', $name, $label);
     }
@@ -89,12 +102,12 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Renders a file upload field with a preview thumbnail of the uploaded file
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\File_Field
      */
-    public function file($name, $label)
+    public function file($name, $label = null)
     {
         return $this->getFieldInstance('file', $name, $label);
     }
@@ -102,51 +115,61 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Displays a text area, the contents of which will be automatically printed before the closing </body> of each
      * page (during wp_footer())
-     *
      * Useful for printing Google Analytics tracking code, or user-defined javascript
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Footer_Scripts_Field
      */
-    public function footerScripts($name, $label)
+    public function footerScripts($name, $label = null)
     {
         return $this->getFieldInstance('footer_scripts', $name, $label);
     }
 
     /**
      * Displays a text area, the contents of which will be automatically printed in the <head> of each page
-     *
      * Useful for printing user-defined javascript, as well as styles, meta tags, etc
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Footer_Scripts_Field
      */
-    public function headerScripts($name, $label)
+    public function headerScripts($name, $label = null)
     {
         return $this->getFieldInstance('header_scripts', $name, $label);
     }
 
     /**
+     * Add a hidden field
+     *
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
+     *
+     * @return \Carbon_Fields\Field\Hidden_Field
+     */
+    public function hidden($name, $label = null)
+    {
+        return $this->getFieldInstance('hidden', $name, $label);
+    }
+
+    /**
      * Render custom HTML markup
      *
-     * @param $name
-     * @param $label
+     * @param string $name Field Name
      *
      * @return \Carbon_Fields\Field\Html_Field
      */
-    public function html($name, $label)
+    public function html($name)
     {
-        return $this->getFieldInstance('html', $name, $label);
+        return $this->getFieldInstance('html', $name, null);
     }
 
     /**
      * Renders an image upload button with a preview thumbnail of the uploaded image
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Image_Field
@@ -159,7 +182,7 @@ class FieldFactory implements FieldFactoryContract
     /**
      * The map field provides a Google-powered map with an address search field
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Map_Field
@@ -172,7 +195,7 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Creates a list of tick-able options (checkboxes)
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Set_Field
@@ -185,7 +208,7 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Creates a radio selector with pre-defined options
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Radio_Field
@@ -199,7 +222,7 @@ class FieldFactory implements FieldFactoryContract
      * Behaves exactly like a Radio field, but the passed option values should be fully qualified urls to image
      * thumbnails which will be displayed instead of traditional labels
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Radio_Image_Field
@@ -212,7 +235,7 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Creates a select box with pre-defined options
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Select_Field
@@ -225,7 +248,7 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Creates visual separator between adjacent fields
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Separator_Field
@@ -238,7 +261,7 @@ class FieldFactory implements FieldFactoryContract
     /**
      * This field renders the built-in WordPress tinyMCE WYSIWYG editor
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Rich_Text_Field
@@ -251,7 +274,7 @@ class FieldFactory implements FieldFactoryContract
     /**
      * The text field renders a text input field
      *
-     * @param string $name Field Name
+     * @param string      $name Field Name
      * @param string|null $label
      *
      * @return \Carbon_Fields\Field\Text_Field
@@ -264,7 +287,7 @@ class FieldFactory implements FieldFactoryContract
     /**
      * Multiline text input with HTML allowed
      *
-     * @param string $name Field Name
+     * @param string      $name Field Name
      * @param string|null $label
      *
      * @return \Carbon_Fields\Field\Textarea_Field
@@ -274,11 +297,10 @@ class FieldFactory implements FieldFactoryContract
         return $this->getFieldInstance('textarea', $name, $label);
     }
 
-
     /**
      * Renders a time picker field
      *
-     * @param string $name Field Name
+     * @param string      $name Field Name
      * @param string|null $label
      *
      * @return \Carbon_Fields\Field\Textarea_Field

@@ -17,11 +17,12 @@ class FieldFactoyTest extends TestCase
     {
         return [
             ['association'],
+            ['complex'],
             ['checkbox'],
             ['color'],
             ['date'],
             ['file'],
-            ['html'],
+            ['hidden'],
             ['image'],
             ['map'],
             ['radio'],
@@ -105,6 +106,23 @@ class FieldFactoyTest extends TestCase
             $fields->headerScripts('field-id', 'Field Title')
         );
 
+    }
+
+    public function test_build_html_field()
+    {
+        $carbonFields = Mockery::mock('alias:Carbon_Fields\Field\Field');
+
+        $carbonFields->shouldReceive('factory')
+            ->once()
+            ->with('html', 'field-id', null)
+            ->andReturnSelf();
+
+        $fields = new FieldFactory();
+
+        $this->assertInstanceOf(
+            \Carbon_Fields\Field\Field::class,
+            $fields->html('field-id')
+        );
     }
 
     public function test_build_multi_checkbox_field()

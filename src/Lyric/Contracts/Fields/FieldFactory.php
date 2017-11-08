@@ -7,8 +7,8 @@ interface FieldFactory
     /**
      * This field allows to select and reorder multiple post type posts, taxonomy terms, users or comments
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Association_Field
      */
@@ -17,8 +17,8 @@ interface FieldFactory
     /**
      * The checkbox field create a single tick-able option with a label next to it
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Checkbox_Field
      */
@@ -27,18 +27,28 @@ interface FieldFactory
     /**
      * Color picker field
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Color_Field
      */
     public function color($name, $label);
 
     /**
+     * Complex fields act as containers to which you can add multiple groups of fields
+     *
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
+     *
+     * @return \Carbon_Fields\Field\Complex_Field
+     */
+    public function complex($name, $label);
+
+    /**
      * Renders a date picker
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Date_Field
      */
@@ -47,8 +57,8 @@ interface FieldFactory
     /**
      * Renders a date picker
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Date_Time_Field
      */
@@ -57,8 +67,8 @@ interface FieldFactory
     /**
      * Renders a file upload field with a preview thumbnail of the uploaded file
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\File_Field
      */
@@ -67,11 +77,10 @@ interface FieldFactory
     /**
      * Displays a text area, the contents of which will be automatically printed before the closing </body> of each
      * page (during wp_footer())
-     *
      * Useful for printing Google Analytics tracking code, or user-defined javascript
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Footer_Scripts_Field
      */
@@ -79,30 +88,38 @@ interface FieldFactory
 
     /**
      * Displays a text area, the contents of which will be automatically printed in the <head> of each page
-     *
      * Useful for printing user-defined javascript, as well as styles, meta tags, etc
      *
-     * @param $name
-     * @param $label
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Footer_Scripts_Field
      */
     public function headerScripts($name, $label);
 
     /**
+     * Add a hidden field
+     *
+     * @param string      $name  Field Name
+     * @param string|null $label Field Label
+     *
+     * @return \Carbon_Fields\Field\Hidden_Field
+     */
+    public function hidden($name, $label = null);
+
+    /**
      * Render custom HTML markup
      *
-     * @param $name
-     * @param $label
+     * @param string $name Field Name
      *
      * @return \Carbon_Fields\Field\Html_Field
      */
-    public function html($name, $label);
+    public function html($name);
 
     /**
      * Renders an image upload button with a preview thumbnail of the uploaded image
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Image_Field
@@ -112,7 +129,7 @@ interface FieldFactory
     /**
      * The map field provides a Google-powered map with an address search field
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Map_Field
@@ -122,7 +139,7 @@ interface FieldFactory
     /**
      * Creates a list of tick-able options (checkboxes)
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Set_Field
@@ -132,7 +149,7 @@ interface FieldFactory
     /**
      * Creates a radio selector with pre-defined options
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Radio_Field
@@ -143,7 +160,7 @@ interface FieldFactory
      * Behaves exactly like a Radio field, but the passed option values should be fully qualified urls to image
      * thumbnails which will be displayed instead of traditional labels
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Radio_Image_Field
@@ -153,7 +170,7 @@ interface FieldFactory
     /**
      * Creates a select box with pre-defined options
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Select_Field
@@ -163,7 +180,7 @@ interface FieldFactory
     /**
      * Creates visual separator between adjacent fields
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Separator_Field
@@ -173,7 +190,7 @@ interface FieldFactory
     /**
      * This field renders the built-in WordPress tinyMCE WYSIWYG editor
      *
-     * @param string $name Field Name
+     * @param string      $name  Field Name
      * @param string|null $label Field Label
      *
      * @return \Carbon_Fields\Field\Rich_Text_Field
@@ -183,7 +200,7 @@ interface FieldFactory
     /**
      * The text field renders a text input field
      *
-     * @param string $name Field Name
+     * @param string      $name Field Name
      * @param string|null $label
      *
      * @return \Carbon_Fields\Field\Text_Field
@@ -193,18 +210,17 @@ interface FieldFactory
     /**
      * Multiline text input with HTML allowed
      *
-     * @param string $name Field Name
+     * @param string      $name Field Name
      * @param string|null $label
      *
      * @return \Carbon_Fields\Field\Textarea_Field
      */
     public function textarea($name, $label = null);
 
-
     /**
      * Renders a time picker field
      *
-     * @param string $name Field Name
+     * @param string      $name Field Name
      * @param string|null $label
      *
      * @return \Carbon_Fields\Field\Textarea_Field
