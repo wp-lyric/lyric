@@ -2,29 +2,26 @@
 
 namespace Lyric\PostTypes;
 
+use Lyric\Hooks\BindToWordPress;
 use Lyric\Support\Strings;
 
-class Column
+class Column implements BindToWordPress
 {
     use HasParentPostType;
-
     /**
      * Column title
-     *
      * @var string
      */
     protected $title;
 
     /**
      * Column identify
-     *
      * @var string
      */
-    protected $columnId;
+    protected $columnName;
 
     /**
      * Callback used to render column content
-     *
      * @var callable
      */
     protected $callback;
@@ -32,35 +29,30 @@ class Column
     /**
      * Insert custom column in determined position
      * Supported after|before
-     *
      * @var string
      */
     protected $position;
 
     /**
      * Insert custom column next to this
-     *
      * @var string
      */
     protected $next;
 
     /**
      * This is sortable column
-     *
      * @var bool
      */
     protected $sortable = false;
 
     /**
      * Meta key used to sort column
-     *
      * @var string
      */
     protected $metaKey;
 
     /**
      * Column is marked to be removed
-     *
      * @var bool
      */
     protected $removeColumn = false;
@@ -68,20 +60,21 @@ class Column
     /**
      * Column constructor.
      *
-     * @param $postType
-     * @param $tittle
+     * @param mixed       $postType
+     * @param string      $columnName
+     * @param string|null $title
      */
-    public function __construct($postType, $id, $title = null)
+    public function __construct($postType, $columnName, $title = null)
     {
         $this->setPostType($postType);
 
         if (is_null($title)) {
-            $title = $id;
-            $id = Strings::slug($title);
+            $title = $columnName;
+            $columnName = Strings::slug($title);
         }
 
         $this->title = $title;
-        $this->columnId = $id;
+        $this->columnName = $columnName;
     }
 
     /**
@@ -101,13 +94,13 @@ class Column
     /**
      * Insert column before specified column
      *
-     * @param string $columnId
+     * @param string $columnName
      *
      * @return $this
      */
-    public function before($columnId)
+    public function before($columnName)
     {
-        $this->position($columnId, 'before');
+        $this->position($columnName, 'before');
 
         return $this;
     }
@@ -115,13 +108,13 @@ class Column
     /**
      * Insert column after specified column
      *
-     * @param string $columnId
+     * @param string $columnName
      *
      * @return $this
      */
-    public function after($columnId)
+    public function after($columnName)
     {
-        $this->position($columnId, 'after');
+        $this->position($columnName, 'after');
 
         return $this;
     }
@@ -151,7 +144,6 @@ class Column
 
     /**
      * Mark column to be removed
-     *
      * @return $this
      */
     public function remove()
@@ -166,9 +158,9 @@ class Column
      */
     public function bind()
     {
-        if($this->removeColumn) {
+        if ($this->removeColumn) {
             add_filter("manage_{$this->postType}_posts_columns", function ($columns) {
-                unset($columns[$this->columnId]);
+                unset($columns[$this->columnName]);
 
                 return $columns;
             });
@@ -176,37 +168,37 @@ class Column
             return $this;
         }
 
+        if ($this->sortable) {
+            add_filter("manage_edit-{$this->postType}_sortable_columns", function ($columns) {
+                $columns[$this->columnName] = $this->metaKey;
+
+                return $columns;
+            });
+        }
+
         add_filter("manage_{$this->postType}_posts_columns", function ($columns) {
-            $columns = $this->resolveColumns($columns, $this->columnId, $this->title, $this->next, $this->position);
+            $columns = $this->resolveColumns($columns, $this->columnName, $this->title, $this->next, $this->position);
 
             return $columns;
         });
 
         add_action("manage_{$this->postType}_posts_custom_column", function ($column, $postId) {
-            if ($column == $this->columnId) {
+            if ($column == $this->columnName) {
                 $callback = $this->callback;
                 if (is_callable($callback)) {
                     echo $callback($postId);
                 }
             }
         }, 10, 2);
-
-        if ($this->sortable) {
-            add_filter("manage_edit-{$this->postType}_sortable_columns", function ($columns) {
-                $columns[$this->columnId] = $this->metaKey;
-
-                return $columns;
-            });
-        }
     }
 
     /**
      * Include new item in the columns list
      *
-     * @param $columns
-     * @param $newItemId
-     * @param $newItemTitle
-     * @param $nextItemId
+     * @param        $columns
+     * @param        $newItemId
+     * @param        $newItemTitle
+     * @param        $nextItemId
      * @param string $position
      *
      * @return array

@@ -8,20 +8,20 @@ class ColumnsFactory implements ColumnsFactoryContract
 {
     /**
      * Post type name
-     *
      * @var string
      */
     protected $postType;
 
     /**
      * List of the columns
-     *
      * @var array
      */
     protected $columns = [];
 
     /**
      * ColumnsFactory constructor.
+     *
+     * @param string $postType
      */
     public function __construct($postType)
     {
@@ -31,17 +31,17 @@ class ColumnsFactory implements ColumnsFactoryContract
     /**
      * Add new column and return Column instance
      *
-     * @param $title
-     * @param null $id
+     * @param string      $columnTitle
+     * @param string|null $columnName
      *
      * @return Column
      */
-    public function addColumn($title, $id = null)
+    public function addColumn($columnTitle, $columnName = null)
     {
-        if (!is_null($id)) {
-            $column = new Column($this->postType, $id, $title);
+        if (!is_null($columnName)) {
+            $column = new Column($this->postType, $columnName, $columnTitle);
         } else {
-            $column = new Column($this->postType, $title);
+            $column = new Column($this->postType, $columnTitle);
         }
 
         $this->columns[] = $column;
@@ -52,13 +52,13 @@ class ColumnsFactory implements ColumnsFactoryContract
     /**
      * Remove column
      *
-     * @param $id
+     * @param string $columnName
      *
      * @return Column
      */
-    public function removeColumn($id)
+    public function removeColumn($columnName)
     {
-        $column = $this->addColumn('', $id);
+        $column = $this->addColumn('', $columnName);
         $column->remove();
 
         return $column;

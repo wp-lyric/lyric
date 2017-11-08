@@ -5,6 +5,7 @@ namespace Lyric\Taxonomies;
 use Lyric\Contracts\Taxonomies\TaxonomyFactory as TaxonomyFactoryContract;
 use Lyric\Contracts\Taxonomies\TaxonomyRegister;
 use Lyric\Contracts\Fields\FieldFactory;
+use Lyric\Hooks\BindToWordPress;
 
 class TaxonomyFactory implements TaxonomyFactoryContract
 {
@@ -20,7 +21,6 @@ class TaxonomyFactory implements TaxonomyFactoryContract
 
     /**
      * List of the TaxonomyBase to factory
-     *
      * @var array
      */
     protected $taxonomies = [];
@@ -29,8 +29,8 @@ class TaxonomyFactory implements TaxonomyFactoryContract
      * TaxonomyFactory constructor.
      *
      * @param TaxonomyRegister $taxonomyRegister
-     * @param FieldFactory $fieldFactory
-     * @param $postType
+     * @param FieldFactory     $fieldFactory
+     * @param                  $postType
      */
     public function __construct(TaxonomyRegister $taxonomyRegister, FieldFactory $fieldFactory, $postType)
     {
@@ -43,6 +43,8 @@ class TaxonomyFactory implements TaxonomyFactoryContract
      * Add new TaxonomyBase class
      *
      * @param $taxonomyBase
+     *
+     * @return $this
      */
     public function addTaxonomy($taxonomyBase)
     {
@@ -57,7 +59,7 @@ class TaxonomyFactory implements TaxonomyFactoryContract
     public function bind()
     {
         foreach ($this->taxonomies as $taxonomy) {
-            if($taxonomy instanceof TaxonomyBase) {
+            if ($taxonomy instanceof BindToWordPress) {
                 $taxonomy->bind();
             }
         }

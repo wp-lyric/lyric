@@ -4,10 +4,10 @@ namespace LyricTests\PostTypes;
 
 use Lyric\PostTypes\Column;
 use Lyric\PostTypes\ColumnsFactory;
-use PHPUnit\Framework\TestCase;
+use LyricTests\LyricTestCase;
 use Mockery;
 
-class ColumnsFactoryTest extends TestCase
+class ColumnsFactoryTest extends LyricTestCase
 {
     protected function tearDown()
     {
@@ -15,7 +15,10 @@ class ColumnsFactoryTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_return_column_factory_instance()
+    /**
+     * Return column factory instance
+     */
+    public function testReturnColumnFactoryInstance()
     {
         $columnFactory = new ColumnsFactory('post-type');
         $column = $columnFactory->addColumn('Column Title', 'column-id');
@@ -23,29 +26,35 @@ class ColumnsFactoryTest extends TestCase
 
         $this->assertInstanceOf(Column::class, $column);
 
-        $this->assertAttributeEquals('column-id', 'columnId', $column);
+        $this->assertAttributeEquals('column-id', 'columnName', $column);
         $this->assertAttributeEquals('Column Title', 'title', $column);
 
-        $this->assertAttributeEquals('column-extra', 'columnId', $columnExtra);
+        $this->assertAttributeEquals('column-extra', 'columnName', $columnExtra);
         $this->assertAttributeEquals('Column Extra', 'title', $columnExtra);
 
         $this->assertAttributeNotEmpty('columns', $columnFactory);
         $this->assertAttributeContainsOnly(Column::class, 'columns', $columnFactory);
     }
 
-    public function test_remove_column()
+    /**
+     * Remove column
+     */
+    public function testRemoveColumn()
     {
         $columnFactory = new ColumnsFactory('post-type');
         $column = $columnFactory->removeColumn('column-id');
 
-        $this->assertAttributeEquals('column-id', 'columnId', $column);
+        $this->assertAttributeEquals('column-id', 'columnName', $column);
         $this->assertAttributeEquals(true, 'removeColumn', $column);
 
         $this->assertAttributeNotEmpty('columns', $columnFactory);
         $this->assertAttributeContainsOnly(Column::class, 'columns', $columnFactory);
     }
 
-    public function test_should_build_all_registered_columns()
+    /**
+     * Remove column
+     */
+    public function testShouldBuildAllRegisteredColumns()
     {
         $column1 = Mockery::mock('Lyric\PostTypes\Column');
         $column2 = Mockery::mock('Lyric\PostTypes\Column');
@@ -55,11 +64,7 @@ class ColumnsFactoryTest extends TestCase
 
         $columnFactory = new ColumnsFactory('post-type');
 
-        $refection = new \ReflectionClass(ColumnsFactory::class);
-
-        $columnsList = $refection->getProperty('columns');
-        $columnsList->setAccessible(true);
-        $columnsList->setValue($columnFactory, [$column1, $column2]);
+        $this->setProtectedProperty($columnFactory, 'columns', [$column1, $column2]);
 
         $this->assertNull(
             $columnFactory->bind()

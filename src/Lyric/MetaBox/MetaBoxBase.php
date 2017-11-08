@@ -2,30 +2,27 @@
 
 namespace Lyric\MetaBox;
 
-use Lyric\Contracts\MetaBox\MetaBoxBase as MetaBoxBaseContract;
 use Lyric\Contracts\MetaBox\MetaBoxBuilder;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\PostTypes\PostTypeBase;
+use Lyric\Hooks\BindToWordPress;
 
-abstract class MetaBoxBase implements MetaBoxBaseContract
+abstract class MetaBoxBase implements BindToWordPress
 {
     /**
      * Post type name
-     *
      * @var string|PostTypeBase
      */
     protected $postType;
 
     /**
      * MetaBox priority
-     *
      * @var string
      */
     protected $priority;
 
     /**
      * MetaBox context
-     *
      * @var string
      */
     protected $context;
@@ -33,7 +30,6 @@ abstract class MetaBoxBase implements MetaBoxBaseContract
     /**
      * MetaBox Builder
      * Used to configure meta-box
-     *
      * @var MetaBoxBuilder
      */
     protected $metaBoxBuilder;
@@ -41,7 +37,6 @@ abstract class MetaBoxBase implements MetaBoxBaseContract
     /**
      * Carbon Fields instance
      * Used to builder the metaBox fields
-     *
      * @var FieldFactory
      */
     protected $fieldFactory;
@@ -50,7 +45,7 @@ abstract class MetaBoxBase implements MetaBoxBaseContract
      * Base constructor.
      *
      * @param MetaBoxBuilder $metaBoxBuilder
-     * @param FieldFactory $fieldFactory
+     * @param FieldFactory   $fieldFactory
      */
     public function __construct(MetaBoxBuilder $metaBoxBuilder, FieldFactory $fieldFactory)
     {
@@ -77,23 +72,9 @@ abstract class MetaBoxBase implements MetaBoxBaseContract
     abstract protected function fields(FieldFactory $fieldFactory);
 
     /**
-     * Show the container only on posts from the specified type(s).
-     *
-     * @param string|PostTypeBase $postType
-     *
-     * @return $this
-     */
-    final public function setPostType($postType)
-    {
-        $this->metaBoxBuilder->setPostType($postType);
-
-        return $this;
-    }
-
-    /**
      * Register metaBox and fields using Carbon_Fields hooks
      */
-    final public function bind()
+    public function bind()
     {
         $this->settings($this->metaBoxBuilder);
         add_action('carbon_fields_register_fields', function () {

@@ -3,8 +3,9 @@
 namespace Lyric\Contracts\Taxonomies;
 
 use Lyric\Contracts\Fields\FieldFactory;
+use Lyric\Hooks\BindToWordPress;
 
-interface TaxonomyFactory
+interface TaxonomyFactory extends BindToWordPress
 {
     /**
      * TaxonomyFactory constructor.
@@ -21,9 +22,4 @@ interface TaxonomyFactory
      * @param $taxonomyBase
      */
     public function addTaxonomy($taxonomyBase);
-
-    /**
-     * Bind all TaxonomyBase classes
-     */
-    public function bind();
 }

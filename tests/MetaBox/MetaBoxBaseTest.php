@@ -3,11 +3,11 @@
 namespace LyricTests\MetaBox;
 
 use LyricTests\LyricTestCase;
+use LyricTests\MetaBox\Fixtures\MetaBoxFaker;
 use Mockery;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\MetaBox\MetaBoxBuilder;
 use Brain\Monkey\Functions;
-use Lyric\MetaBox\MetaBoxBase;
 
 class MetaBoxBaseTest extends LyricTestCase
 {
@@ -19,53 +19,15 @@ class MetaBoxBaseTest extends LyricTestCase
     }
 
     /**
-     * Set post type name using post type instance
-     */
-    public function testSetPostTypeNameUsingPostTypeInstance()
-    {
-        $fields = Mockery::mock(FieldFactory::class);
-
-        $metaBoxBuilder = Mockery::mock(MetaBoxBuilder::class);
-
-        $postType = Mockery::mock(\Lyric\Contracts\PostTypes\PostTypeBase::class);
-
-        $metaBox = Mockery::mock(MetaBoxBase::class, [$metaBoxBuilder, $fields])
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods();
-
-        $metaBoxBuilder->shouldReceive('setPostType')
-            ->once()
-            ->with($postType)
-            ->andReturnSelf();
-
-        $this->assertInstanceOf(\Lyric\Contracts\MetaBox\MetaBoxBase::class, $metaBox->setPostType($postType));
-    }
-
-    /**
      * Should register extended meta box class
      */
     public function testShouldRegisterExtendedMetaBoxClass()
     {
-        $fields = Mockery::mock(FieldFactory::class);
+        $fieldsFactory = Mockery::mock(FieldFactory::class);
 
         $metaBoxBuilder = Mockery::mock(MetaBoxBuilder::class);
 
-        $metaBox = Mockery::mock(MetaBoxBase::class, [$metaBoxBuilder, $fields])
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods();
-
-
-        $metaBox->shouldReceive('settings')
-            ->once()
-            ->with($metaBoxBuilder)
-            ->andReturn([
-
-            ]);
-
-        $metaBox->shouldReceive('fields')
-            ->once()
-            ->with(Mockery::type(FieldFactory::class))
-            ->andReturn(['field-one']);
+        $metaBox = new MetaBoxFaker($metaBoxBuilder, $fieldsFactory);
 
 
         $metaBoxBuilder->shouldReceive('fields')

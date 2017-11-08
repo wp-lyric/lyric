@@ -2,26 +2,13 @@
 
 namespace LyricTests\PostTypes;
 
+use LyricTests\LyricTestCase;
 use Mockery;
-use Brain\Monkey;
 use Brain\Monkey\Functions;
-use PHPUnit\Framework\TestCase;
 use Lyric\PostTypes\PostTypeRegister;
 
-class PostTypeRegisterTest extends TestCase
+class PostTypeRegisterTest extends LyricTestCase
 {
-
-    protected function setUp()
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
-
-    protected function tearDown()
-    {
-        Monkey\tearDown();
-        parent::tearDown();
-    }
 
     public function test_build_names_used_in_post_type_with_single_option()
     {
@@ -273,3 +260,4 @@ class PostTypeRegisterTest extends TestCase
         $this->assertTrue(has_action('init', 'function ()', 1));
     }
 }
+

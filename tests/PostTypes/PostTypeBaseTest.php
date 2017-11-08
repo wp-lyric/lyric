@@ -2,199 +2,195 @@
 
 namespace LyricTests\PostTypes;
 
-use Mockery;
-use PHPUnit\Framework\TestCase;
+use Lyric\Hooks\BindToWordPress;
 use Lyric\PostTypes\PostTypeBase;
+use LyricTests\LyricTestCase;
+use LyricTests\PostTypes\Fixtures\MetaBoxFaker;
+use LyricTests\PostTypes\Fixtures\PostTypeFaker;
+use LyricTests\PostTypes\Fixtures\TaxonomyFaker;
+use Mockery;
 use Lyric\Contracts\PostTypes\PostTypeRegister;
-use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\PostTypes\ColumnsFactory;
 
-class PostTypeBaseTest extends TestCase
+class PostTypeBaseTest extends LyricTestCase
 {
+    protected $taxonomyMockName;
+
+    protected $metaBoxMockName;
+
+    protected function setUp()
+    {
+        parent::setUp();
+    }
+
     public function tearDown()
     {
         Mockery::close();
+        parent::tearDown();
     }
 
-    public function test_in_boot_is_necessary_configure_post_type_name_and_dependencies()
+
+    protected function getContainer()
     {
         $container = Mockery::mock(\League\Container\ContainerInterface::class);
-        $register = Mockery::mock(PostTypeRegister::class);
-        $columnsFactory = Mockery::mock(ColumnsFactory::class);
+        $register = $this->getRegisterPostTypeMock();
+        $columnsFactory = $this->getColumnFactoryMock();
+        $metaBoxFactory = $this->getMetaBoxFactoryMock();
+        $taxonomyFactory = $this->getTaxonomyFactoryMock();
 
-        $lyricPostType = Mockery::namedMock('LyricPostType', PostTypeBase::class)->makePartial();
-
-        // Configure Mocks
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\PostTypes\PostTypeRegister::class, ['lyric-post-type'])
+            ->with(\Lyric\Contracts\PostTypes\PostTypeRegister::class, Mockery::on(function ($argument) {
+                if (is_array($argument) && count($argument) === 1) {
+                    return is_string($argument[0]);
+                }
+
+                return false;
+            }))
             ->andReturn($register);
 
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, [$lyricPostType])
-            ->andReturn($columnsFactory);
-
-        // Execute
-        $lyricPostType->boot($container);
-
-        // Set post type name
-        $this->assertAttributeEquals('lyric-post-type', 'postTypeName', $lyricPostType);
-
-        //
-        $this->assertAttributeEquals(
-            [PostTypeRegister::class => $register, ColumnsFactory::class => $columnsFactory],
-            'resolved',
-            $lyricPostType
-        );
-        $this->assertAttributeEmpty('metaBoxes', $lyricPostType);
-    }
-
-    public function test_should_create_instance_metabox_and_save_local_container()
-    {
-        $container = Mockery::mock(\League\Container\ContainerInterface::class);
-
-        $metaBoxFactory = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxFactory::class);
-
-        $postTypeBase = Mockery::mock(PostTypeBase::class)->makePartial()->shouldAllowMockingProtectedMethods();
-
-
-        // Configure mocks
-        $container->shouldReceive('get')
-            ->once()
             ->with(
                 \Lyric\Contracts\MetaBox\MetaBoxFactory::class,
-                [
-                    \Lyric\Contracts\MetaBox\MetaBoxBuilder::class,
-                    \Lyric\Contracts\Fields\FieldFactory::class,
-                    $postTypeBase
-                ]
+                Mockery::on(function ($argument) {
+                    if (is_array($argument) && count($argument) === 3) {
+                        if ($argument[0] !== \Lyric\Contracts\MetaBox\MetaBoxBuilder::class) {
+                            return false;
+                        }
+
+                        if ($argument[1] !== \Lyric\Contracts\Fields\FieldFactory::class) {
+                            return false;
+                        }
+
+                        return ($argument[2] instanceof PostTypeFaker);
+                    }
+
+                    return false;
+                })
             )
             ->andReturn($metaBoxFactory);
 
-        $metaBoxFactory->shouldReceive('addMetaBox')
-            ->once()
-            ->with('MetaBoxBaseExtended')
-            ->andReturnSelf();
-
-        $metaBoxClassName = get_class($metaBoxFactory);
-
-        /*
-         * Use reflection to configure instance of the PostTypeBase and execute boot method
-         */
-        $reflectPostType = new \ReflectionClass(PostTypeBase::class);
-
-        // Set container
-        $containerProperty = $reflectPostType->getProperty('container');
-        $containerProperty->setAccessible(true);
-        $containerProperty->setValue($postTypeBase, $container);
-
-        // Set MetaBoxes list
-        $metaBoxProperty = $reflectPostType->getProperty('metaBoxes');
-        $metaBoxProperty->setAccessible(true);
-        $metaBoxProperty->setValue($postTypeBase, ['MetaBoxBaseExtended']);
-
-
-        // Invoke method to init metaBoxes
-        $postTypeBase->resolveMetaBoxes();
-
-
-        // Assertions
-        $this->assertAttributeNotEmpty('metaBoxes', $postTypeBase);
-        $this->assertAttributeEquals([
-            $metaBoxClassName => $metaBoxFactory,
-        ],
-            'resolved',
-            $postTypeBase
-        );
-    }
-
-    public function test_create_taxonomies_instances_and_save_to_bind()
-    {
-        $container = Mockery::mock(\League\Container\ContainerInterface::class);
-
-        $taxonomyFactory = Mockery::mock(\Lyric\Contracts\Taxonomies\TaxonomyFactory::class);
-
-        $postTypeBase = Mockery::mock(PostTypeBase::class)->makePartial()->shouldAllowMockingProtectedMethods();
-
-        $taxonomyClassName = get_class($taxonomyFactory);
-
-        // Configure mocks
         $container->shouldReceive('get')
             ->once()
-            ->with(\Lyric\Contracts\Taxonomies\TaxonomyFactory::class, [
-                \Lyric\Contracts\Taxonomies\TaxonomyRegister::class,
-                \Lyric\Contracts\Fields\FieldFactory::class,
-                $postTypeBase
-            ])
+            ->with(
+                \Lyric\Contracts\Taxonomies\TaxonomyFactory::class,
+                Mockery::on(function ($argument) {
+                    if (is_array($argument) && count($argument) === 3) {
+                        if ($argument[0] !== \Lyric\Contracts\Taxonomies\TaxonomyRegister::class) {
+                            return false;
+                        }
+
+                        if ($argument[1] !== \Lyric\Contracts\Fields\FieldFactory::class) {
+                            return false;
+                        }
+
+                        return ($argument[2] instanceof PostTypeFaker);
+                    }
+
+                    return false;
+                })
+            )
             ->andReturn($taxonomyFactory);
 
-        $taxonomyFactory->shouldReceive('addTaxonomy')
+        $container->shouldReceive('get')
             ->once()
-            ->with('TaxonomyBaseExtended')
-            ->andReturnSelf();
+            ->with(\Lyric\Contracts\PostTypes\ColumnsFactory::class, Mockery::on(function ($argument) {
+                if (is_array($argument) && count($argument) === 1) {
+                    return ($argument[0] instanceof PostTypeFaker);
+                }
 
-        /*
-       * Use reflection to configure instance of the PostTypeBase and execute boot method
-       */
-        $reflectPostType = new \ReflectionClass(PostTypeBase::class);
+                return false;
+            }))
+            ->andReturn($columnsFactory);
 
-        // Set container
-        $containerProperty = $reflectPostType->getProperty('container');
-        $containerProperty->setAccessible(true);
-        $containerProperty->setValue($postTypeBase, $container);
-
-        // Set MetaBoxes list
-        $metaBoxProperty = $reflectPostType->getProperty('taxonomies');
-        $metaBoxProperty->setAccessible(true);
-        $metaBoxProperty->setValue($postTypeBase, ['TaxonomyBaseExtended']);
-
-        // Execute
-        $postTypeBase->resolveTaxonomies();
-
-        // Assertions
-        $this->assertAttributeNotEmpty('taxonomies', $postTypeBase);
-        $this->assertAttributeEquals([
-            $taxonomyClassName => $taxonomyFactory,
-        ],
-            'resolved',
-            $postTypeBase
-        );
+        return $container;
     }
 
-    public function test_should_bind_post_type_to_wordpress()
+    protected function getRegisterPostTypeMock()
     {
-        $register = Mockery::mock(PostTypeRegister::class);
-        $metaBox = Mockery::mock(\Lyric\Contracts\Metabox\MetaBoxBase::class);
+        $mock = Mockery::mock(PostTypeRegister::class);
 
-        // Configure mocks
-        $register->shouldReceive('bind')
+
+        $mock->shouldReceive('bind')
             ->once()
             ->withNoArgs()
             ->andReturnSelf();
 
-        $metaBox->shouldReceive('bind')
+        return $mock;
+    }
+
+    protected function getColumnFactoryMock()
+    {
+        $mock = Mockery::mock(ColumnsFactory::class);
+
+        $mock->shouldReceive('bind')
             ->once()
             ->withNoArgs()
             ->andReturnSelf();
 
+        return $mock;
+    }
 
-        // Post Type instance
-        $customPostType = $this->getMockBuilder(PostTypeBase::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getMetaBoxInstance'])
-            ->getMockForAbstractClass();
+    protected function getMetaBoxFactoryMock()
+    {
+        $mock = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxFactory::class);
 
-        $reflectPostType = new \ReflectionClass(PostTypeBase::class);
+        $this->metaBoxMockName = get_class($mock);
 
-        // Set resolved objects list
-        $metaBoxProperty = $reflectPostType->getProperty('resolved');
-        $metaBoxProperty->setAccessible(true);
-        $metaBoxProperty->setValue($customPostType, [
-            PostTypeRegister::class => $register,
-            \Lyric\Metabox\MetaBoxBase::class => $metaBox
-        ]);
+        $mock->shouldReceive('addMetaBox')
+            ->once()
+            ->with(MetaBoxFaker::class)
+            ->andReturnSelf();
 
-        $this->assertNull($customPostType->bind());
+        $mock->shouldReceive('bind')
+            ->once()
+            ->withNoArgs()
+            ->andReturnSelf();
+
+        return $mock;
+    }
+
+    protected function getTaxonomyFactoryMock()
+    {
+        $mock = Mockery::mock(\Lyric\Contracts\Taxonomies\TaxonomyFactory::class);
+
+        $this->taxonomyMockName = get_class($mock);
+
+        $mock->shouldReceive('addTaxonomy')
+            ->once()
+            ->with(TaxonomyFaker::class)
+            ->andReturnSelf();
+
+        $mock->shouldReceive('bind')
+            ->once()
+            ->withNoArgs()
+            ->andReturnSelf();
+
+        return $mock;
+    }
+
+    /**
+     * Should build post type and dependencies
+     */
+    public function testShouldBuildPostTypeAndDependencies()
+    {
+        $postType = new PostTypeFaker($this->getContainer());
+        $postType->bind();
+
+        $this->assertAttributeEquals('post-type-faker', 'postTypeName', $postType);
+
+        $resolvedList = $this->getObjectAttribute($postType, 'resolved');
+
+        $this->assertInstanceOf(PostTypeRegister::class, $resolvedList[PostTypeRegister::class]);
+
+        $this->assertInstanceOf(\Lyric\Contracts\MetaBox\MetaBoxFactory::class, $resolvedList[$this->metaBoxMockName]);
+
+        $this->assertInstanceOf(
+            \Lyric\Contracts\Taxonomies\TaxonomyFactory::class,
+            $resolvedList[$this->taxonomyMockName]
+        );
+
+        $this->assertInstanceOf(ColumnsFactory::class, $resolvedList[ColumnsFactory::class]);
     }
 }

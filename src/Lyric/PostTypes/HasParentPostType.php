@@ -6,7 +6,6 @@ trait HasParentPostType
 {
     /**
      * Post type name
-     *
      * @var string
      */
     protected $postType;
@@ -14,15 +13,15 @@ trait HasParentPostType
     /**
      * Set post type name
      *
-     * @param $postType
+     * @param string $postType
      */
     public function setPostType($postType)
     {
-        if($postType instanceof \Lyric\Contracts\PostTypes\PostTypeRegister) {
+        if ($postType instanceof \Lyric\Contracts\PostTypes\PostTypeRegister) {
             $postType = $postType->getName();
         }
 
-        if($postType instanceof  \Lyric\Contracts\PostTypes\PostTypeBase) {
+        if ($postType instanceof \Lyric\Contracts\PostTypes\PostTypeBase) {
             $postType = $postType->getPostTypeName();
         }
 

@@ -2,7 +2,9 @@
 
 namespace Lyric\Contracts\PostTypes;
 
-interface PostTypeBase
+use Lyric\Hooks\BindToWordPress;
+
+interface PostTypeBase extends BindToWordPress
 {
     /**
      * Return post type name
@@ -10,9 +12,4 @@ interface PostTypeBase
      * @return string
      */
     public function getPostTypeName();
-
-    /**
-     * Bind Post Type to WordPress
-     */
-    public function bind();
 }

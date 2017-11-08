@@ -8,47 +8,40 @@ use Lyric\Support\Strings;
 
 class TaxonomyRegister implements TaxonomyRegisterContract
 {
-
-  use HasParentPostType;
+    use HasParentPostType;
 
     /**
      * Taxonomy name
-     *
      * @var string
      */
     protected $taxonomyName;
 
     /**
      * The human friendly singular name.
-     *
      * @var string
      */
     protected $singular;
 
     /**
      * The human friendly plural name.
-     *
      * @var string
      */
     protected $plural;
 
     /**
      * The post type slug.
-     *
      * @var string
      */
     protected $slug;
 
     /**
      * The labels passed for the post type.
-     *
      * @var array
      */
     protected $labels = [];
 
     /**
      * The options passed for the post type.
-     *
      * @var array
      */
     protected $options = [];
@@ -61,11 +54,11 @@ class TaxonomyRegister implements TaxonomyRegisterContract
      */
     public function __construct($names = null, $postType = null)
     {
-        if(!is_null($names)) {
+        if (!is_null($names)) {
             $this->assignNames($names);
         }
 
-        if(!is_null($postType)) {
+        if (!is_null($postType)) {
             $this->setPostType($postType);
         }
     }
@@ -145,7 +138,6 @@ class TaxonomyRegister implements TaxonomyRegisterContract
 
     /**
      * Return taxonomy name
-     *
      * @return string
      */
     public function getName()
@@ -157,6 +149,7 @@ class TaxonomyRegister implements TaxonomyRegisterContract
      * Set post type slug
      *
      * @param string $slug
+     * @param bool   $format
      *
      * @return $this
      */
@@ -174,15 +167,14 @@ class TaxonomyRegister implements TaxonomyRegisterContract
 
     /**
      * Return list of default labels used in register of the post type
-     *
      * @return array
      */
     protected function defaultLabels()
     {
         return [
-            'name' => sprintf(__('%s', 'lyric'), $this->plural),
+            'name'          => sprintf(__('%s', 'lyric'), $this->plural),
             'singular_name' => sprintf(__('%s', 'lyric'), $this->singular),
-            'menu_name' => sprintf(__('%s', 'lyric'), $this->plural),
+            'menu_name'     => sprintf(__('%s', 'lyric'), $this->plural),
         ];
     }
 
@@ -190,6 +182,8 @@ class TaxonomyRegister implements TaxonomyRegisterContract
      * Set the post type labels.
      *
      * @param array $labels An array of post type options
+     *
+     * @return $this
      */
     public function labels(array $labels)
     {
@@ -200,7 +194,6 @@ class TaxonomyRegister implements TaxonomyRegisterContract
 
     /**
      * Get labels list using configured labels and default values
-     *
      * @return array
      */
     public function getLabels()
@@ -210,16 +203,15 @@ class TaxonomyRegister implements TaxonomyRegisterContract
 
     /**
      * Return list of default options
-     *
      * @return array
      */
     protected function defaultOptions()
     {
         return [
-            'public' => true,
+            'public'  => true,
             'rewrite' => [
-                'slug' => $this->slug
-            ]
+                'slug' => $this->slug,
+            ],
         ];
     }
 
@@ -227,6 +219,8 @@ class TaxonomyRegister implements TaxonomyRegisterContract
      * Set the post type options.
      *
      * @param array $options an array of post type options
+     *
+     * @return $this
      */
     public function options(array $options)
     {
@@ -237,7 +231,6 @@ class TaxonomyRegister implements TaxonomyRegisterContract
 
     /**
      * Get options list using configured labels and default values
-     *
      * @return array
      */
     public function getOptions()

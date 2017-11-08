@@ -21,7 +21,10 @@ class ColumnTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_should_register_basic_columns_configurations()
+    /**
+     * Should register basic columns configurations
+     */
+    public function testShouldRegisterBasicColumnsConfigurations()
     {
         $column = new Column('post-type', 'Column Title');
 
@@ -30,11 +33,14 @@ class ColumnTest extends TestCase
         });
 
         $this->assertAttributeEquals('Column Title', 'title', $column);
-        $this->assertAttributeEquals('column-title', 'columnId', $column);
+        $this->assertAttributeEquals('column-title', 'columnName', $column);
         $this->assertAttributeInternalType('callable', 'callback', $column);
     }
 
-    public function test_should_register_column_position()
+    /**
+     * Should register column position
+     */
+    public function testShouldRegisterColumnPosition()
     {
         $column = new Column('post-type', 'Column');
 
@@ -48,7 +54,10 @@ class ColumnTest extends TestCase
         $this->assertAttributeEquals('after', 'position', $column);
     }
 
-    public function test_set_sortable_column_using_meta_key()
+    /**
+     * Set sortable column using meta key
+     */
+    public function testSetSortableColumnUsingMetaKey()
     {
         $column = new Column('post-type', 'Column');
 
@@ -58,7 +67,10 @@ class ColumnTest extends TestCase
         $this->assertAttributeEquals('meta-key', 'metaKey', $column);
     }
 
-    public function test_bind_should_call_correctly_hooks()
+    /**
+     * Bind should call correctly hooks
+     */
+    public function testBindShouldCallCorrectlyHooks()
     {
         $column = new Column('post-type', 'Custom Column');
 
@@ -75,7 +87,10 @@ class ColumnTest extends TestCase
         $this->assertTrue(has_filter('manage_edit-post-type_sortable_columns', 'function ($columns)'));
     }
 
-    public function test_register_complete_custom_column()
+    /**
+     * Register complete custom column(
+     */
+    public function testRegisterCompleteCustomColumn()
     {
         $columnTitles = [
             'title' => 'Column - Post title',
@@ -133,7 +148,10 @@ class ColumnTest extends TestCase
         $this->expectOutputString('This is columns to post with ID: 42');
     }
 
-    public function test_register_column_using_minimal_options()
+    /**
+     * Register column using minimal options
+     */
+    public function testRegisterColumnUsingMinimalOptions()
     {
         $columnTitles = [
             'title' => 'Column - Post title',
@@ -163,7 +181,10 @@ class ColumnTest extends TestCase
         ], $columnTitles);
     }
 
-    public function test_remove_column_of_the_post_type_admin()
+    /**
+     * Remove column of the post type admin
+     */
+    public function testRemoveColumnOfThePostTypeAdmin()
     {
         // Settings
         $columnTitles = [

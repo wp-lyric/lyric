@@ -1,10 +1,10 @@
 <?php
 
-namespace LyricTests\MetaBox\Fixtures;
+namespace LyricTests\PostTypes\Fixtures;
 
-use Lyric\MetaBox\MetaBoxBase;
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\MetaBox\MetaBoxBuilder;
+use Lyric\MetaBox\MetaBoxBase;
 
 class MetaBoxFaker extends MetaBoxBase
 {

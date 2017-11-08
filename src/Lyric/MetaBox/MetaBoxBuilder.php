@@ -12,35 +12,30 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
 
     /**
      * MetaBox title
-     *
      * @var string
      */
     protected $title;
 
     /**
      * MetaBox priority
-     *
      * @var string
      */
     protected $priority;
 
     /**
      * MetaBox context
-     *
      * @var string
      */
     protected $context;
 
     /**
      * Meta box has tabs
-     *
      * @var bool
      */
     protected $withTabs = false;
 
     /**
      * Prefix used to build tab name
-     *
      * @var string
      */
     protected $tabNamePrefix;
@@ -48,7 +43,6 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
     /**
      * Carbon Fields instance
      * Used to builder the metaBox fields
-     *
      * @var array
      */
     protected $fields = [];
@@ -98,7 +92,7 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
     /**
      * Force tabs in meta-box
      *
-     * @param $hasTabs
+     * @param string $prefix
      *
      * @return $this
      */
@@ -126,7 +120,6 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
 
     /**
      * Build Options Page using Carbon_Fields
-     *
      * @return \Carbon_Fields\Container\Theme_Options_Container
      */
     public function build()
@@ -149,33 +142,43 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
             $postMetaContainer->set_context($this->context);
         }
 
-        // Configure fields
-        if ($this->withTabs) {
-            $count = 0;
-            foreach ($this->fields as $field) {
-                $tabName = sprintf('%1$s %2$s', $this->tabNamePrefix, ++$count);
-                $postMetaContainer->add_tab($tabName, $field);
-            }
-
-        } elseif ($this->fieldsHasTabs()) {
-            foreach ($this->fields as $tab => $field) {
-                $postMetaContainer->add_tab($tab, $field);
-            }
-
-        } else {
-            $postMetaContainer->add_fields($this->fields);
-        }
+        $postMetaContainer = $this->addFields($postMetaContainer);
 
 
         return $postMetaContainer;
     }
 
     /**
-     * Test if array is associative
+     * Add fields and register tabs if exist
      *
+     * @param \Carbon_Fields\Container\Post_Meta_Container|object $postMetaContainer
+     *
+     * @return mixed
+     */
+    protected function addFields($postMetaContainer)
+    {
+        if ($this->withTabs) {
+            $count = 0;
+            foreach ($this->fields as $field) {
+                $tabName = sprintf('%1$s %2$s', $this->tabNamePrefix, ++$count);
+                $postMetaContainer->add_tab($tabName, $field);
+            }
+        } elseif ($this->fieldsHasTabFormat()) {
+            foreach ($this->fields as $tab => $field) {
+                $postMetaContainer->add_tab($tab, $field);
+            }
+        } else {
+            $postMetaContainer->add_fields($this->fields);
+        }
+
+        return $postMetaContainer;
+    }
+
+    /**
+     * Test if array is associative
      * @return bool
      */
-    private function fieldsHasTabs()
+    private function fieldsHasTabFormat()
     {
         if ([] === $this->fields) {
             return false;
@@ -189,7 +192,7 @@ class MetaBoxBuilder implements MetaBoxBuilderContract
      *
      * @param $title
      *
-     * @return \Carbon_Fields\Container\Theme_Options_Container|object
+     * @return \Carbon_Fields\Container\Post_Meta_Container|object
      */
     protected function getCarbonFieldContainer($title)
     {

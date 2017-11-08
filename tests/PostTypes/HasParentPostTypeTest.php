@@ -14,7 +14,10 @@ class HasParentPostTypeTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_register_parent_post_type_if_is_string()
+    /**
+     * Register parent post type if is string
+     */
+    public function testRegisterParentPostTypeIfIsString()
     {
         $hasParentPostType = new HasParentPostTypeDummy();
 
@@ -23,7 +26,10 @@ class HasParentPostTypeTest extends TestCase
         $this->assertAttributeEquals('lyric-post-type', 'postType', $hasParentPostType);
     }
 
-    public function test_should_register_parent_post_type_if_is_register_instance()
+    /**
+     * Should register parent post type if is register instance
+     */
+    public function testShouldRegisterParentPostTypeIfIsRegisterInstance()
     {
         $register = Mockery::mock(\Lyric\Contracts\PostTypes\PostTypeRegister::class);
 
@@ -39,7 +45,10 @@ class HasParentPostTypeTest extends TestCase
         $this->assertAttributeEquals('lyric-post-type', 'postType', $hasParentPostType);
     }
 
-    public function test_should_register_parent_post_type_if_is_base_instance()
+    /**
+     * Should_register_parent_post_type_if_is_base_instance
+     */
+    public function testShouldRegisterParentPostTypeIfIsBaseInstance()
     {
         $register = Mockery::mock(\Lyric\Contracts\PostTypes\PostTypeBase::class);
 

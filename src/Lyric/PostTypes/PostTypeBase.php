@@ -3,11 +3,13 @@
 namespace Lyric\PostTypes;
 
 use Lyric\Contracts\PostTypes\PostTypeBase as PostTypeBaseContract;
+use Lyric\Contracts\MetaBox\MetaBoxFactory;
 use League\Container\ContainerInterface;
 use Lyric\Contracts\PostTypes\PostTypeRegister;
 use Lyric\Contracts\PostTypes\ColumnsFactory;
-use Lyric\Contracts\Fields\FieldFactory;
+use Lyric\Contracts\Taxonomies\TaxonomyFactory;
 use Lyric\Support\Strings;
+use Lyric\Hooks\BindToWordPress;
 
 abstract class PostTypeBase implements PostTypeBaseContract
 {
@@ -15,35 +17,30 @@ abstract class PostTypeBase implements PostTypeBaseContract
      * Assign the post type names.
      * Accepts post type string or array
      * Options to array: name, slug, plural, singular.
-     *
      * @var string|array
      */
     protected $postTypeName;
 
     /**
      * List of the MetaBox\Base
-     *
      * @var array
      */
     protected $metaBoxes = [];
 
     /**
      * List of the TaxonomyBase instances
-     *
      * @var array
      */
     protected $taxonomies = [];
 
     /**
      * Container instance
-     *
      * @var ContainerInterface
      */
     protected $container;
 
     /**
      * List of the resolved instances
-     *
      * @var array
      */
     protected $resolved = [];
@@ -61,10 +58,9 @@ abstract class PostTypeBase implements PostTypeBaseContract
     /**
      * Builder Post Type object
      *
-     * @param PostTypeRegister $register
-     * @param FieldFactory $fields
+     * @param ContainerInterface $container
      */
-    final public function boot(ContainerInterface $container)
+    final protected function boot(ContainerInterface $container)
     {
         $this->container = $container;
 
@@ -89,9 +85,6 @@ abstract class PostTypeBase implements PostTypeBaseContract
 
     /**
      * Register the post type name
-     *
-     * @param PostTypeRegister $register
-     *
      * @return PostTypeRegister
      */
     final protected function registerPostTypeNames()
@@ -109,14 +102,14 @@ abstract class PostTypeBase implements PostTypeBaseContract
     /**
      * Register meta-boxes in MetaBoxFactory
      */
-    final public function resolveMetaBoxes()
+    final protected function resolveMetaBoxes()
     {
         $metaBoxFactory = $this->container->get(
-            \Lyric\Contracts\MetaBox\MetaBoxFactory::class,
+            MetaBoxFactory::class,
             [
                 \Lyric\Contracts\MetaBox\MetaBoxBuilder::class,
                 \Lyric\Contracts\Fields\FieldFactory::class,
-                $this
+                $this,
             ]
         );
 
@@ -131,14 +124,14 @@ abstract class PostTypeBase implements PostTypeBaseContract
     /**
      * Register taxonomies in TaxonomyFactory
      */
-    final public function resolveTaxonomies()
+    final protected function resolveTaxonomies()
     {
         $taxonomyFactory = $this->container->get(
-            \Lyric\Contracts\Taxonomies\TaxonomyFactory::class,
+            TaxonomyFactory::class,
             [
                 \Lyric\Contracts\Taxonomies\TaxonomyRegister::class,
                 \Lyric\Contracts\Fields\FieldFactory::class,
-                $this
+                $this,
             ]
         );
 
@@ -151,10 +144,9 @@ abstract class PostTypeBase implements PostTypeBaseContract
 
     /**
      * Return post type name
-     *
      * @return string
      */
-    public function getPostTypeName()
+    final public function getPostTypeName()
     {
         return $this->resolved[PostTypeRegister::class]->getName();
     }
@@ -171,7 +163,6 @@ abstract class PostTypeBase implements PostTypeBaseContract
         return $register;
     }
 
-
     /**
      * Used to add and to configure columns in the actual post type
      *
@@ -187,10 +178,10 @@ abstract class PostTypeBase implements PostTypeBaseContract
     /**
      * Bind Post Type to WordPress
      */
-    final public function bind()
+    public function bind()
     {
         foreach ($this->resolved as $object) {
-            if (is_object($object) && method_exists($object, 'bind')) {
+            if ($object instanceof BindToWordPress) {
                 $object->bind();
             }
         }

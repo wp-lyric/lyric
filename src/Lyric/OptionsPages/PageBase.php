@@ -4,13 +4,12 @@ namespace Lyric\OptionsPages;
 
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\OptionsPages\PageBuilder;
-use Lyric\Contracts\OptionsPages\PageBase as PageBaseContract;
+use Lyric\Hooks\BindToWordPress;
 
-abstract class PageBase implements PageBaseContract
+abstract class PageBase implements BindToWordPress
 {
     /**
      * Array of the class to configure child options pages
-     *
      * @var array
      */
     protected $childPages;
@@ -28,7 +27,7 @@ abstract class PageBase implements PageBaseContract
     /**
      * PageBase constructor.
      *
-     * @param PageBuilder $pageBuilder
+     * @param PageBuilder  $pageBuilder
      * @param FieldFactory $fieldFactory
      */
     public function __construct(PageBuilder $pageBuilder, FieldFactory $fieldFactory)
@@ -39,7 +38,6 @@ abstract class PageBase implements PageBaseContract
 
     /**
      * Get slug of the page options
-     *
      * @return string
      */
     final public function getSlug()
@@ -68,7 +66,7 @@ abstract class PageBase implements PageBaseContract
     /**
      * Bind option page to WordPress
      */
-    final public function bind()
+    public function bind()
     {
         $childPageBuilder = clone $this->pageBuilder;
 
@@ -85,7 +83,6 @@ abstract class PageBase implements PageBaseContract
 
         // Bind child pages
         if (is_array($this->childPages) || !empty($this->childPages)) {
-
             $childPageBuilder->parent($this);
 
             foreach ($this->childPages as $childPage) {
@@ -95,7 +92,7 @@ abstract class PageBase implements PageBaseContract
                     $this->fieldFactory
                 );
 
-                if ($childPageInstance instanceof PageBaseContract) {
+                if ($childPageInstance instanceof PageBase) {
                     $childPageInstance->bind();
                 }
             }

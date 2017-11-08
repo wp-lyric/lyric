@@ -20,7 +20,7 @@ class LyricTest extends LyricTestCase
     /**
      * @return \Mockery\MockInterface
      */
-    protected function get_mock_container()
+    protected function getMockContainer()
     {
         $container = Mockery::mock(Container::class);
 
@@ -67,7 +67,10 @@ class LyricTest extends LyricTestCase
         return $container;
     }
 
-    public function test_get_lyric_instance()
+    /**
+     * Get lyric instance using static method
+     */
+    public function testGetLyricInstanceUsingStaticMethod()
     {
         $lyric = Lyric::make();
 
@@ -75,22 +78,54 @@ class LyricTest extends LyricTestCase
         $this->assertEquals($lyric, Lyric::make());
     }
 
-    public function test_should_register_container()
+    /**
+     * Should register container
+     */
+    public function testShouldRegisterContainer()
     {
-        $container = $this->get_mock_container();
+        $container = $this->getMockContainer();
         $lyric = new Lyric($container);
 
         $this->assertAttributeInstanceOf(Container::class, 'container', $lyric);
         $this->assertInstanceOf(Container::class, $lyric->container());
     }
 
-    public function test_should_register_post_types()
+    public function testRegisterClassThatTheLyricWillBindToWordPress()
     {
-        $postType = Mockery::mock(PostTypeBase::class);
-        $container = $this->get_mock_container();
+        //
+        $container = $this->getMockContainer();
 
+        $container->shouldReceive('has')
+            ->once()
+            ->with(\LyricTests\PostTypes\Fixtures\PostTypeFaker::class)
+            ->andReturn(false);
+
+        $container->shouldReceive('share')
+            ->once()
+            ->with(\LyricTests\PostTypes\Fixtures\PostTypeFaker::class)
+            ->andReturnSelf();
+
+        // Act
         $lyric = new Lyric($container);
 
+        //Class using trait \Lyric\Hooks\BindToWordPress
+        $lyric->addToBind(\LyricTests\PostTypes\Fixtures\PostTypeFaker::class);
+
+        // Asserts
+        $this->assertAttributeContains(
+            \LyricTests\PostTypes\Fixtures\PostTypeFaker::class,
+            'binds',
+            $lyric
+        );
+    }
+
+    /**
+     * Should register post types
+     */
+    public function testShouldRegisterPostTypes()
+    {
+        $postType = Mockery::mock('PostTypeBase');
+        $container = $this->getMockContainer();
 
         // Configure mocks
         $container->shouldReceive('share')
@@ -103,15 +138,20 @@ class LyricTest extends LyricTestCase
             ->with($container)
             ->andReturnSelf();
 
-        $container->shouldReceive('has')
-            ->once()
-            ->with(PostTypeBase::class)
-            ->andReturn($postType);
-
         $container->shouldReceive('get')
             ->times(3)
             ->with(PostTypeBase::class)
             ->andReturn($postType);
+
+        $container->shouldReceive('has')
+            ->twice()
+            ->with(PostTypeBase::class)
+            ->andReturn(true);
+
+        $container->shouldReceive('has')
+            ->once()
+            ->with('NonexistentPostType')
+            ->andReturn(false);
 
         $postType->shouldReceive('getPostTypeName')
             ->once()
@@ -119,26 +159,25 @@ class LyricTest extends LyricTestCase
             ->andReturn('lyric-post-type');
 
 
-        $container->shouldReceive('has')
-            ->once()
-            ->with('FakePostType')
-            ->andReturn(false);
-
-
+        $lyric = new Lyric($container);
         $lyric->addPostType(PostTypeBase::class);
 
 
         // Assertions
         $this->assertAttributeEquals(['lyric-post-type' => PostTypeBase::class], 'postTypeList', $lyric);
+        $this->assertAttributeContains(PostTypeBase::class, 'binds', $lyric);
         $this->assertEquals($postType, $lyric->postType('lyric-post-type'));
         $this->assertEquals($postType, $lyric->postType(PostTypeBase::class));
-        $this->assertFalse($lyric->postType('FakePostType'));
+        $this->assertFalse($lyric->postType('NonexistentPostType'));
     }
 
-    public function test_save_taxonomies_to_bind_in_lyric_boot()
+    /**
+     * Save taxonomies to bind in lyric boot
+     */
+    public function testSaveTaxonomiesToBindInLyricBoot()
     {
         $taxonomyRegister = Mockery::mock(\Lyric\Contracts\Taxonomies\TaxonomyRegister::class);
-        $container = $this->get_mock_container();
+        $container = $this->getMockContainer();
         $lyric = new Lyric($container);
 
         // Configure mocks
@@ -162,6 +201,11 @@ class LyricTest extends LyricTestCase
             ->with(\Lyric\Contracts\Fields\FieldFactory::class)
             ->andReturnSelf();
 
+        $container->shouldReceive('has')
+            ->once()
+            ->with(\Lyric\Taxonomies\TaxonomyBase::class)
+            ->andReturn(true);
+
         $taxonomyRegister->shouldReceive('setPostType')
             ->once()
             ->with('lyric-post-type')
@@ -171,13 +215,16 @@ class LyricTest extends LyricTestCase
         $lyric->addTaxonomy(\Lyric\Taxonomies\TaxonomyBase::class, 'lyric-post-type');
 
         // Assertions
-        $this->assertAttributeContains(\Lyric\Taxonomies\TaxonomyBase::class, 'taxonomiesList', $lyric);
+        $this->assertAttributeContains(\Lyric\Taxonomies\TaxonomyBase::class, 'binds', $lyric);
     }
 
-    public function test_add_meta_box_and_save_to_bind_in_boot()
+    /**
+     * Add meta box and save to bind in boot
+     */
+    public function testAddMetaBoxAndSaveToBindInBoot()
     {
         $metaBoxBuilder = Mockery::mock(\Lyric\Contracts\MetaBox\MetaBoxBuilder::class);
-        $container = $this->get_mock_container();
+        $container = $this->getMockContainer();
         $lyric = new Lyric($container);
 
         // Configure mocks
@@ -188,7 +235,7 @@ class LyricTest extends LyricTestCase
 
         $container->shouldReceive('share')
             ->once()
-            ->with(\Lyric\Contracts\MetaBox\MetaBoxBase::class)
+            ->with(\Lyric\MetaBox\MetaBoxBase::class)
             ->andReturnSelf();
 
         $container->shouldReceive('withArgument')
@@ -201,6 +248,11 @@ class LyricTest extends LyricTestCase
             ->with(\Lyric\Contracts\Fields\FieldFactory::class)
             ->andReturnSelf();
 
+        $container->shouldReceive('has')
+            ->once()
+            ->with(\Lyric\MetaBox\MetaBoxBase::class)
+            ->andReturn(true);
+
         $metaBoxBuilder->shouldReceive('setPostType')
             ->once()
             ->with('lyric-post-type')
@@ -208,19 +260,18 @@ class LyricTest extends LyricTestCase
 
 
         // Execute
-        $lyric->addMetaBox(\Lyric\Contracts\MetaBox\MetaBoxBase::class, 'lyric-post-type');
+        $lyric->addMetaBox(\Lyric\MetaBox\MetaBoxBase::class, 'lyric-post-type');
 
         // Assertions
-        $this->assertAttributeContains(
-            \Lyric\Contracts\MetaBox\MetaBoxBase::class,
-            'metaBoxesList',
-            $lyric
-        );
+        $this->assertAttributeContains(\Lyric\MetaBox\MetaBoxBase::class, 'binds', $lyric);
     }
 
-    public function test_should_register_options_page()
+    /**
+     * Should register options page
+     */
+    public function testShouldRegisterOptionsPage()
     {
-        $container = $this->get_mock_container();
+        $container = $this->getMockContainer();
         $lyric = new Lyric($container);
 
 
@@ -240,16 +291,24 @@ class LyricTest extends LyricTestCase
             ->with(\Lyric\Contracts\Fields\FieldFactory::class)
             ->andReturnSelf();
 
+        $container->shouldReceive('has')
+            ->once()
+            ->with(PageBase::class)
+            ->andReturn(true);
+
         // Act
         $lyric->addOptionsPage(PageBase::class);
 
         // Assertions
-        $this->assertAttributeContains(PageBase::class, 'optionsPageList', $lyric);
+        $this->assertAttributeContains(PageBase::class, 'binds', $lyric);
     }
 
-    public function test_bind_post_type_to_wordpress()
+    /**
+     * Bind post type to WordPress
+     */
+    public function testBindPostTypeToWordPress()
     {
-        $container = $this->get_mock_container();
+        $container = $this->getMockContainer();
 
         // Used fake name to prevent mockery from call original final methods in class
         $postType = Mockery::mock("PostTypeBase");
@@ -313,19 +372,14 @@ class LyricTest extends LyricTestCase
 
         // Add mocks to Lyric
         $this->setProtectedProperty($lyric, 'postTypeList', [
-            'lyric-post-type' => 'PostTypeBase'
+            'lyric-post-type' => 'PostTypeBase',
         ]);
 
-        $this->setProtectedProperty($lyric, 'taxonomiesList', [
-            'TaxonomyBase'
-        ]);
-
-        $this->setProtectedProperty($lyric, 'metaBoxesList', [
-            'MetaBoxBase'
-        ]);
-
-        $this->setProtectedProperty($lyric, 'optionsPageList', [
-            'PageBase'
+        $this->setProtectedProperty($lyric, 'binds', [
+            'PostTypeBase',
+            'TaxonomyBase',
+            'MetaBoxBase',
+            'PageBase',
         ]);
 
         // Act

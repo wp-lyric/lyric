@@ -4,32 +4,35 @@ namespace Lyric\MetaBox;
 
 use Lyric\Contracts\Fields\FieldFactory;
 use Lyric\Contracts\MetaBox\MetaBoxBuilder;
+use Lyric\Contracts\MetaBox\MetaBoxFactory as MetaBoxFactoryContract;
+use Lyric\Hooks\BindToWordPress;
 
-class MetaBoxFactory
+class MetaBoxFactory implements MetaBoxFactoryContract
 {
     /**
      * MetaBoxBuilder instance
-     *
      * @var MetaBoxBuilder
      */
     protected $metaBoxBuilder;
 
     /**
      * FieldFactory instance
-     *
      * @var FieldFactory
      */
     protected $fieldFactory;
 
     /**
      * List of the MetaBoxBase
-     *
      * @var array
      */
     protected $metaBoxes = [];
 
     /**
-     * MetaBoxFactory constructor.
+     * MetaBoxFactory constructor
+     *
+     * @param MetaBoxBuilder $metaBoxBuilder
+     * @param FieldFactory   $fieldFactory
+     * @param string         $postType
      */
     public function __construct(MetaBoxBuilder $metaBoxBuilder, FieldFactory $fieldFactory, $postType)
     {
@@ -59,7 +62,7 @@ class MetaBoxFactory
     public function bind()
     {
         foreach ($this->metaBoxes as $metaBox) {
-            if($metaBox instanceof MetaBoxBase) {
+            if ($metaBox instanceof BindToWordPress) {
                 $metaBox->bind();
             }
         }

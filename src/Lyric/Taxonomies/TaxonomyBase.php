@@ -4,10 +4,11 @@ namespace Lyric\Taxonomies;
 
 use Lyric\Contracts\Taxonomies\TaxonomyRegister;
 use Lyric\Contracts\Fields\FieldFactory;
+use Lyric\Hooks\BindToWordPress;
 use Lyric\Support\Strings;
 use Carbon_Fields\Container\Container;
 
-abstract class TaxonomyBase
+abstract class TaxonomyBase implements BindToWordPress
 {
     /**
      * Taxonomy Name
@@ -53,7 +54,7 @@ abstract class TaxonomyBase
     /**
      * Register the post type name
      *
-     * @param TaxonomyRegister $register
+     * @param TaxonomyRegister $taxonomyRegister
      *
      * @return TaxonomyRegister
      */
@@ -87,13 +88,15 @@ abstract class TaxonomyBase
      */
     protected function fields(FieldFactory $fieldFactory)
     {
-        return [];
+        return [
+            // Configure your fields using FieldFactory
+        ];
     }
 
     /**
      * Bind taxonomy and fields to WordPress
      */
-    final public function bind()
+    public function bind()
     {
         $this->taxonomyRegister->bind();
 

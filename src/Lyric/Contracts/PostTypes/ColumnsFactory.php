@@ -2,7 +2,9 @@
 
 namespace Lyric\Contracts\PostTypes;
 
-interface ColumnsFactory
+use Lyric\Hooks\BindToWordPress;
+
+interface ColumnsFactory extends BindToWordPress
 {
     /**
      * ColumnsFactory constructor.
@@ -12,24 +14,19 @@ interface ColumnsFactory
     /**
      * Add new column and return Column instance
      *
-     * @param $title
-     * @param null $id
+     * @param string      $columnTitle
+     * @param string|null $columnName
      *
      * @return \Lyric\PostTypes\Column
      */
-    public function addColumn($title, $id = null);
+    public function addColumn($columnTitle, $columnName = null);
 
     /**
      * Remove column
      *
-     * @param $id
+     * @param string $columnName
      *
      * @return \Lyric\PostTypes\Column
      */
-    public function removeColumn($id);
-
-    /**
-     * Bind all registered columns to WordPress
-     */
-    public function bind();
+    public function removeColumn($columnName);
 }

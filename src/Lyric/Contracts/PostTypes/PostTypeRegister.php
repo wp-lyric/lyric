@@ -2,7 +2,9 @@
 
 namespace Lyric\Contracts\PostTypes;
 
-interface PostTypeRegister
+use Lyric\Hooks\BindToWordPress;
+
+interface PostTypeRegister extends BindToWordPress
 {
     /**
      * Assign the post type names.
@@ -54,9 +56,4 @@ interface PostTypeRegister
      * @return $this
      */
     public function icon($icon);
-
-    /**
-     * Bind methods to WordPress actions and filters.
-     */
-    public function bind();
 }

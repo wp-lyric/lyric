@@ -38,7 +38,7 @@ class MetaBoxFactoryTest extends LyricTestCase
 
         // Assert
         $this->assertTrue(
-            has_action('carbon_fields_register_fields', 'function ()') // Action called in MetaBoxBaseFake::class
+            has_action('carbon_fields_register_fields', 'function ()') // Action called in MetaBoxFaker::class
         );
     }
 }

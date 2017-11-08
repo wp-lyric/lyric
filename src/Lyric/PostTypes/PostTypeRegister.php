@@ -9,49 +9,42 @@ class PostTypeRegister implements PostTypeRegisterContract
 {
     /**
      * The post type name.
-     *
      * @var string
      */
     protected $postTypeName;
 
     /**
      * The human friendly singular name.
-     *
      * @var string
      */
     protected $singular;
 
     /**
      * The human friendly plural name.
-     *
      * @var string
      */
     protected $plural;
 
     /**
      * The post type slug.
-     *
      * @var string
      */
     protected $slug;
 
     /**
      * The post type icon
-     *
      * @var string
      */
     protected $icon = '';
 
     /**
      * The options passed for the post type.
-     *
      * @var array
      */
     protected $options = [];
 
     /**
      * The labels passed for the post type.
-     *
      * @var array
      */
     protected $labels = [];
@@ -141,7 +134,6 @@ class PostTypeRegister implements PostTypeRegisterContract
 
     /**
      * Return post type name
-     *
      * @return string
      */
     public function getName()
@@ -151,17 +143,16 @@ class PostTypeRegister implements PostTypeRegisterContract
 
     /**
      * Return list of default options
-     *
      * @return array
      */
     protected function defaultOptions()
     {
         return [
-            'public' => true,
+            'public'    => true,
             'menu_icon' => $this->icon,
-            'rewrite' => [
-                'slug' => $this->slug
-            ]
+            'rewrite'   => [
+                'slug' => $this->slug,
+            ],
         ];
     }
 
@@ -169,6 +160,8 @@ class PostTypeRegister implements PostTypeRegisterContract
      * Set the post type options.
      *
      * @param array $options an array of post type options
+     *
+     * @return $this
      */
     public function options(array $options)
     {
@@ -179,7 +172,6 @@ class PostTypeRegister implements PostTypeRegisterContract
 
     /**
      * Get options list using configured labels and default values
-     *
      * @return array
      */
     public function getOptions()
@@ -192,15 +184,14 @@ class PostTypeRegister implements PostTypeRegisterContract
 
     /**
      * Return list of default labels used in register of the post type
-     *
      * @return array
      */
     protected function defaultLabels()
     {
         return [
-            'name' => sprintf(__('%s', 'lyric'), $this->plural),
-            'singular_name' => sprintf(__('%s', 'lyric'), $this->singular),
-            'menu_name' => sprintf(__('%s', 'lyric'), $this->plural),
+            'name'           => sprintf(__('%s', 'lyric'), $this->plural),
+            'singular_name'  => sprintf(__('%s', 'lyric'), $this->singular),
+            'menu_name'      => sprintf(__('%s', 'lyric'), $this->plural),
             'name_admin_bar' => sprintf(__('%s', 'lyric'), $this->singular),
         ];
     }
@@ -209,6 +200,8 @@ class PostTypeRegister implements PostTypeRegisterContract
      * Set the post type labels.
      *
      * @param array $labels An array of post type options
+     *
+     * @return $this
      */
     public function labels(array $labels)
     {
@@ -219,7 +212,6 @@ class PostTypeRegister implements PostTypeRegisterContract
 
     /**
      * Get labels list using configured labels and default values
-     *
      * @return array
      */
     public function getLabels()
@@ -231,6 +223,7 @@ class PostTypeRegister implements PostTypeRegisterContract
      * Set post type slug
      *
      * @param string $slug
+     * @param bool   $format
      *
      * @return $this
      */
@@ -248,7 +241,7 @@ class PostTypeRegister implements PostTypeRegisterContract
     /**
      * Set post type icon
      *
-     * @param string $slug
+     * @param string $icon
      *
      * @return $this
      */

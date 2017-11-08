@@ -3,50 +3,34 @@
 namespace Lyric;
 
 use League\Container\Container;
+use Lyric\Hooks\BindToWordPress;
 
 class Lyric
 {
     /**
      * Lyric instance
-     *
      * @var null|Lyric
      */
     protected static $instance = null;
 
     /**
      * Container instance
-     *
      * @var Container
      */
     protected $container;
 
     /**
      * List of post type class names
-     *
      * @var array
      */
     protected $postTypeList = [];
 
     /**
-     * List of the options pages
+     * List of the classes to bind to WordPress
      *
      * @var array
      */
-    protected $optionsPageList = [];
-
-    /**
-     * List of the taxonomies
-     *
-     * @var array
-     */
-    protected $taxonomiesList = [];
-
-    /**
-     * List of the meta boxes
-     *
-     * @var array
-     */
-    protected $metaBoxesList = [];
+    protected $binds = [];
 
     /**
      * Lyric constructor.
@@ -61,7 +45,6 @@ class Lyric
 
     /**
      * Get Lyric instance
-     *
      * @return Lyric|null
      */
     public static function make()
@@ -111,12 +94,27 @@ class Lyric
 
     /**
      * Return container instance
-     *
      * @return Container
      */
     public function container()
     {
         return $this->container;
+    }
+
+    /**
+     * Bind to WordPress
+     *
+     * @param $class
+     */
+    public function addToBind($class)
+    {
+        if (in_array(BindToWordPress::class, class_implements($class))) {
+            $this->binds[] = $class;
+        }
+
+        if (!$this->container()->has($class)) {
+            $this->container()->share($class);
+        }
     }
 
     /**
@@ -133,6 +131,8 @@ class Lyric
         $postTypeInstance = $this->container()->get($postTypeClass);
 
         $this->postTypeList[$postTypeInstance->getPostTypeName()] = $postTypeClass;
+
+        $this->addToBind($postTypeClass);
 
         return $this;
     }
@@ -177,7 +177,7 @@ class Lyric
             ->withArgument($registerTaxonomy)
             ->withArgument(\Lyric\Contracts\Fields\FieldFactory::class);
 
-        $this->taxonomiesList[] = $taxonomyBaseClass;
+        $this->addToBind($taxonomyBaseClass);
 
         return $this;
     }
@@ -200,7 +200,7 @@ class Lyric
             ->withArgument($metaBoxBuilder)
             ->withArgument(\Lyric\Contracts\Fields\FieldFactory::class);
 
-        $this->metaBoxesList[] = $metaBoxClass;
+        $this->addToBind($metaBoxClass);
 
         return $this;
     }
@@ -218,27 +218,9 @@ class Lyric
             ->withArgument(\Lyric\Contracts\OptionsPages\PageBuilder::class)
             ->withArgument(\Lyric\Contracts\Fields\FieldFactory::class);
 
-        $this->optionsPageList[] = $optionsPageClass;
+        $this->addToBind($optionsPageClass);
 
         return $this;
-    }
-
-    /**
-     * Bind Other objects
-     *
-     * - Options Page
-     * - Taxonomies
-     * - Meta boxes
-     */
-    protected function bindOthersInstances()
-    {
-        $objectsToBind = array_merge( $this->postTypeList, $this->optionsPageList, $this->metaBoxesList, $this->taxonomiesList);
-
-        foreach ($objectsToBind as $item) {
-            if ($this->container()->has($item)) {
-                ($this->container()->get($item))->bind();
-            }
-        }
     }
 
     /**
@@ -251,7 +233,11 @@ class Lyric
      */
     public function boot()
     {
-        $this->bindOthersInstances();
+        foreach ($this->binds as $bind) {
+            if ($this->container()->has($bind)) {
+                ($this->container()->get($bind))->bind();
+            }
+        }
 
         add_action('after_setup_theme', function () {
             \Carbon_Fields\Carbon_Fields::boot();

@@ -241,6 +241,9 @@ class PageBuilderTest extends LyricTestCase
         $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $return);
     }
 
+    /**
+     * Add tabs in options page
+     */
     public function testAddTabsInOptionsPage()
     {
         // Arrange
@@ -284,6 +287,9 @@ class PageBuilderTest extends LyricTestCase
         $this->assertInstanceOf(\Carbon_Fields\Container\Container::class, $adminPageBuilder->build());
     }
 
+    /**
+     * Create tabs to options page automatically
+     */
     public function testCreateTabsToOptionsPageAutomatically()
     {
         // Arrange
