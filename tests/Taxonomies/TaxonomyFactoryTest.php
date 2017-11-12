@@ -2,27 +2,24 @@
 
 namespace LyricTests\Taxonomies;
 
+use Lyric\Taxonomies\TaxonomyBase;
 use Lyric\Taxonomies\TaxonomyFactory;
-use PHPUnit\Framework\TestCase;
+use LyricTests\LyricTestCase;
+use LyricTests\PostTypes\Fixtures\TaxonomyFaker;
 use Mockery;
-use Brain\Monkey;
 
-class TaxonomyFactoryTest extends TestCase
+class TaxonomyFactoryTest extends LyricTestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
-        Monkey\setUp();
-    }
-
     protected function tearDown()
     {
-        Monkey\tearDown();
         Mockery::close();
         parent::tearDown();
     }
 
-    public function test_should_prepare_dependencies_to_base_taxonomy_classes()
+    /**
+     * Should prepare dependencies to base taxonomy classes
+     */
+    public function testShouldPrepareDependenciesToBaseTaxonomyClasses()
     {
         $taxonomyRegister = Mockery::mock(\Lyric\Contracts\Taxonomies\TaxonomyRegister::class);
         $fieldsFactory = Mockery::mock(\Lyric\Contracts\Fields\FieldFactory::class);
@@ -32,8 +29,17 @@ class TaxonomyFactoryTest extends TestCase
             ->with('lyric-post-type')
             ->andReturnSelf();
 
-        $taxonomyFactory = new TaxonomyFactory($taxonomyRegister, $fieldsFactory, 'lyric-post-type');
+        $taxonomyRegister->shouldReceive('assignNames')
+            ->once()
+            ->with(Mockery::type('string'))
+            ->andReturnSelf();
 
+        // Act
+        $taxonomyFactory = new TaxonomyFactory($taxonomyRegister, $fieldsFactory, 'lyric-post-type');
+        $taxonomyFactory->addTaxonomy(TaxonomyFaker::class);
+
+
+        // Asserts
         $this->assertAttributeInstanceOf(
             \Lyric\Contracts\Taxonomies\TaxonomyRegister::class,
             'taxonomyRegister',
@@ -45,5 +51,38 @@ class TaxonomyFactoryTest extends TestCase
             'fieldFactory',
             $taxonomyFactory
         );
+
+        $this->assertAttributeContainsOnly(
+            TaxonomyBase::class,
+            'taxonomies',
+            $taxonomyFactory
+        );
+    }
+
+    /**
+     * Bind taxonomies to WordPress
+     */
+    public function testBindTaxonomiesToWordPress()
+    {
+        $taxonomyRegister = Mockery::mock(\Lyric\Contracts\Taxonomies\TaxonomyRegister::class);
+        $fieldsFactory = Mockery::mock(\Lyric\Contracts\Fields\FieldFactory::class);
+        $taxonomy = Mockery::mock(\Lyric\Taxonomies\TaxonomyBase::class);
+
+        $taxonomyRegister->shouldReceive('setPostType')
+            ->once()
+            ->with('lyric-post-type')
+            ->andReturnSelf();
+
+        $taxonomy->shouldReceive('bind')
+            ->once()
+            ->withNoArgs()
+            ->andReturnSelf();
+
+        // Act
+        $taxonomyFactory = new TaxonomyFactory($taxonomyRegister, $fieldsFactory, 'lyric-post-type');
+
+        $this->setProtectedProperty($taxonomyFactory, 'taxonomies', [$taxonomy]);
+
+        $this->assertNull($taxonomyFactory->bind());
     }
 }
